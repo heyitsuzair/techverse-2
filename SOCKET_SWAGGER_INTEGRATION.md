@@ -1,15 +1,19 @@
 # Socket Messages API - Swagger Integration Complete ✅
 
 ## Overview
+
 The Socket Messages API has been successfully integrated into the Swagger/OpenAPI documentation. You can now explore and test all Socket.IO REST endpoints through the interactive Swagger UI.
 
 ## 🎯 What Was Added
 
 ### 1. New Swagger Tag
+
 **Socket Messages** - Real-time chat message endpoints
 
 ### 2. ChatMessage Schema
+
 Added to `components.schemas` with the following structure:
+
 ```json
 {
   "id": "msg_1234567890_user_456",
@@ -24,6 +28,7 @@ Added to `components.schemas` with the following structure:
 ### 3. API Endpoints Documented
 
 #### GET /api/socket/messages
+
 - **Purpose**: Retrieve paginated messages from a chat room
 - **Parameters**:
   - `roomId` (required): The chat room ID
@@ -32,6 +37,7 @@ Added to `components.schemas` with the following structure:
 - **Response**: Array of ChatMessage objects with pagination info
 
 #### POST /api/socket/messages
+
 - **Purpose**: Send a new chat message
 - **Request Body**:
   - `roomId` (required): The chat room ID
@@ -41,6 +47,7 @@ Added to `components.schemas` with the following structure:
 - **Response**: Created ChatMessage object
 
 #### DELETE /api/socket/messages
+
 - **Purpose**: Delete a specific message
 - **Parameters**:
   - `messageId` (required): The message ID to delete
@@ -50,11 +57,13 @@ Added to `components.schemas` with the following structure:
 ## 📍 How to Access
 
 1. **Start the development server**:
+
    ```bash
    yarn dev
    ```
 
 2. **Open Swagger UI**:
+
    - Navigate to: http://localhost:3000/api-docs
    - Or: http://localhost:3001/api-docs (if port 3000 is busy)
 
@@ -65,6 +74,7 @@ Added to `components.schemas` with the following structure:
 ## 🧪 Testing the API
 
 ### Test GET Messages
+
 1. Click on `GET /api/socket/messages`
 2. Click "Try it out"
 3. Enter:
@@ -74,6 +84,7 @@ Added to `components.schemas` with the following structure:
 4. Click "Execute"
 
 ### Test POST Message
+
 1. Click on `POST /api/socket/messages`
 2. Click "Try it out"
 3. Edit the request body:
@@ -88,6 +99,7 @@ Added to `components.schemas` with the following structure:
 4. Click "Execute"
 
 ### Test DELETE Message
+
 1. First, create a message using POST
 2. Note the `id` in the response
 3. Click on `DELETE /api/socket/messages`
@@ -100,6 +112,7 @@ Added to `components.schemas` with the following structure:
 ## 📁 Files Modified
 
 1. **src/app/api/socket/messages/route.js**
+
    - Added JSDoc comments for Swagger
    - Documented all three methods (GET, POST, DELETE)
    - Complete with parameters, request bodies, and response schemas
@@ -114,6 +127,7 @@ Added to `components.schemas` with the following structure:
 The REST API documented in Swagger works alongside the Socket.IO real-time events:
 
 - **REST API** (Swagger documented):
+
   - HTTP GET: Retrieve messages
   - HTTP POST: Store messages
   - HTTP DELETE: Remove messages
