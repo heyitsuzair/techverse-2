@@ -59,7 +59,7 @@ export default function AddStall() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md w-full mx-4">
           <CardContent className="pt-6 text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -94,8 +94,8 @@ export default function AddStall() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <Text variant="h1" className="mb-2 flex items-center gap-3">

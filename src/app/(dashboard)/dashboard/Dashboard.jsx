@@ -58,52 +58,52 @@ const QUICK_ACTIONS = [
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Text variant="h1" className="mb-2">
+        <div className="mb-6 sm:mb-8">
+          <Text variant="h1" className="mb-2 text-xl sm:text-2xl lg:text-3xl">
             Welcome back, {MOCK_USER.name}!
           </Text>
-          <Text variant="body" className="text-zinc-600">
+          <Text variant="body" className="text-zinc-600 text-sm sm:text-base">
             Here's what's happening with your book exchanges today
           </Text>
         </div>
 
         {/* Profile Snapshot & Points Balance */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Profile Card */}
           <Card className="lg:col-span-2">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="w-20 h-20 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-2xl font-bold">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-xl sm:text-2xl font-bold flex-shrink-0">
                   {MOCK_USER.avatar}
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Text variant="h3">{MOCK_USER.name}</Text>
-                    <Badge variant="primary">{MOCK_USER.level}</Badge>
+                <div className="flex-1 w-full">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                    <Text variant="h3" className="text-lg sm:text-xl">{MOCK_USER.name}</Text>
+                    <Badge variant="primary" className="text-xs sm:text-sm">{MOCK_USER.level}</Badge>
                   </div>
-                  <Text variant="body" className="text-zinc-600 mb-4">
+                  <Text variant="body" className="text-zinc-600 mb-3 sm:mb-4 text-sm sm:text-base">
                     Member since {MOCK_USER.memberSince}
                   </Text>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-3 sm:gap-4">
                     <div>
-                      <Text variant="caption" className="text-zinc-500">Books Listed</Text>
-                      <Text variant="h3" className="text-primary">{MOCK_USER.booksListed}</Text>
+                      <Text variant="caption" className="text-zinc-500 text-xs sm:text-sm">Books Listed</Text>
+                      <Text variant="h3" className="text-primary text-lg sm:text-xl lg:text-2xl">{MOCK_USER.booksListed}</Text>
                     </div>
                     <div>
-                      <Text variant="caption" className="text-zinc-500">Exchanged</Text>
-                      <Text variant="h3" className="text-primary">{MOCK_USER.booksExchanged}</Text>
+                      <Text variant="caption" className="text-zinc-500 text-xs sm:text-sm">Exchanged</Text>
+                      <Text variant="h3" className="text-primary text-lg sm:text-xl lg:text-2xl">{MOCK_USER.booksExchanged}</Text>
                     </div>
                     <div>
-                      <Text variant="caption" className="text-zinc-500">Success Rate</Text>
-                      <Text variant="h3" className="text-secondary">94%</Text>
+                      <Text variant="caption" className="text-zinc-500 text-xs sm:text-sm">Success Rate</Text>
+                      <Text variant="h3" className="text-secondary text-lg sm:text-xl lg:text-2xl">94%</Text>
                     </div>
                   </div>
                 </div>
-                <LinkWithProgress href={routes.dashboard.profile}>
-                  <Button variant="outline" size="sm">
+                <LinkWithProgress href={routes.dashboard.profile} className="w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     View Profile
                   </Button>
                 </LinkWithProgress>
@@ -114,19 +114,17 @@ export default function Dashboard() {
           {/* Points Balance Card */}
           <Card className="bg-linear-to-br from-primary to-secondary text-primary-foreground">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-primary-foreground flex items-center gap-2">
-                  <Award className="w-5 h-5" />
-                  Points Balance
-                </CardTitle>
-              </div>
+              <CardTitle className="text-primary-foreground flex items-center gap-2 text-base sm:text-lg">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                Points Balance
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <Text variant="h1" className="text-primary-foreground mb-4">
+              <Text variant="h1" className="text-primary-foreground mb-3 sm:mb-4 text-3xl sm:text-4xl lg:text-5xl">
                 {MOCK_USER.points}
               </Text>
               <LinkWithProgress href={routes.dashboard.points.buy}>
-                <Button variant="outline" size="sm" className="!bg-primary-foreground text-primary border-primary-foreground hover:!bg-primary-foreground/90 w-full">
+                <Button variant="outline" size="sm" className="!bg-primary-foreground text-primary border-primary-foreground hover:!bg-primary-foreground/90 w-full text-sm sm:text-base">
                   Buy More Points
                 </Button>
               </LinkWithProgress>
@@ -168,17 +166,10 @@ export default function Dashboard() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Recent Activity
-                  </CardTitle>
-                  <LinkWithProgress href={routes.dashboard.profile}>
-                    <Button variant="ghost" size="sm">
-                      View All
-                    </Button>
-                  </LinkWithProgress>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Recent Activity
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
