@@ -35,6 +35,7 @@ model User {
   // Relations
   books     Book[]
   exchanges Exchange[]
+  payments  Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,7 +108,7 @@ model BookHistory {
 
 model Exchange {
   id     String @id @default(uuid())
-  status String @default("pending") // "pending", "accepted", "completed", "cancelled"
+  status String @default("pending") // "pending", "accepted", "declined", "confirmed", "completed", "cancelled"
 
   // Book being exchanged
   bookId String
@@ -117,13 +118,28 @@ model Exchange {
   requesterId String
   requester   User   @relation(fields: [requesterId], references: [id], onDelete: Cascade)
 
+  // Points system
+  pointsOffered Int // AI-calculated book value
+  pointsLocked  Boolean @default(false) // Points locked when pending
+  
   // Exchange details
-  message        String?
-  meetingAddress String?
-  meetingLat     Float?
-  meetingLng     Float?
-  scheduledAt    DateTime?
-  completedAt    DateTime?
+  message             String?
+  meetingAddress      String?
+  meetingLat          Float?
+  meetingLng          Float?
+  scheduledAt         DateTime?
+  confirmationDeadline DateTime? // Deadline for requester to confirm
+  
+  // Book condition after exchange
+  bookConditionRating Int? // 1-5 rating given by requester after receiving
+  
+  // Declined info
+  declinedReason String?
+  declinedAt     DateTime?
+  
+  // Completion info
+  completedAt DateTime?
+  completedBy String? // "requester" or "system" (auto-complete after deadline)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,4 +147,62 @@ model Exchange {
   @@index([bookId])
   @@index([requesterId])
   @@index([status])
+  @@index([pointsLocked])
+}
+
+model PointPackage {
+  id             String   @id @default(uuid())
+  name           String // "Starter Pack", "Popular Pack", "Bulk Pack"
+  description    String?
+  price          Float // Price in dollars
+  points         Int // Number of points in package
+  bonusPoints    Int      @default(0) // Extra bonus points
+  features       String[] // Array of features ["500 Exchange Points", "Valid for 6 months"]
+  validityMonths Int      @default(6) // Package validity in months
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0) // For displaying in order
+
+  // Badge/Label
+  badge String? // "Best Value", "Save 25%"
+
+  // Relations
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model Payment {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packageId String
+  package   PointPackage @relation(fields: [packageId], references: [id], onDelete: Restrict)
+
+  // Stripe details
+  stripeSessionId       String  @unique
+  stripePaymentIntentId String?
+
+  // Payment info
+  amount          Float // Amount paid in dollars
+  currency        String @default("usd")
+  pointsPurchased Int // Total points (package points + bonus)
+
+  // Status
+  status String @default("pending") // "pending", "completed", "failed", "refunded"
+
+  // Metadata
+  metadata Json? // Additional Stripe metadata
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime? // When payment was successful
+
+  @@index([userId])
+  @@index([packageId])
+  @@index([status])
+  @@index([stripeSessionId])
 }

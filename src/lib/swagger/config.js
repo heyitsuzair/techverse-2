@@ -379,6 +379,138 @@ export const swaggerConfig = {
           },
         },
       },
+      PointPackage: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "pkg-uuid-123",
+          },
+          name: {
+            type: "string",
+            example: "Popular Pack",
+          },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "Best value for regular book enthusiasts",
+          },
+          price: {
+            type: "number",
+            format: "float",
+            example: 19.99,
+            description: "Price in dollars",
+          },
+          points: {
+            type: "number",
+            example: 1000,
+            description: "Base points in package",
+          },
+          bonusPoints: {
+            type: "number",
+            example: 200,
+            description: "Bonus points added to base",
+          },
+          totalPoints: {
+            type: "number",
+            example: 1200,
+            description: "Total points (base + bonus)",
+          },
+          features: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: [
+              "1,200 Exchange Points",
+              "Valid for 12 months",
+              "Priority support",
+              "Bonus: 200 extra points",
+            ],
+          },
+          validityMonths: {
+            type: "number",
+            example: 12,
+            description: "Package validity in months",
+          },
+          badge: {
+            type: "string",
+            nullable: true,
+            example: "Best Value - Save 17%",
+            description: "Display badge/label",
+          },
+        },
+      },
+      PaymentHistory: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "payment-uuid-123",
+          },
+          packageName: {
+            type: "string",
+            example: "Popular Pack",
+          },
+          packageDescription: {
+            type: "string",
+            nullable: true,
+            example: "Best value for regular users",
+          },
+          amount: {
+            type: "number",
+            format: "float",
+            example: 19.99,
+            description: "Amount paid in dollars",
+          },
+          currency: {
+            type: "string",
+            example: "usd",
+          },
+          pointsPurchased: {
+            type: "number",
+            example: 1200,
+            description: "Total points purchased (including bonus)",
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "completed", "failed", "refunded"],
+            example: "completed",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          completedAt: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+            example: "2026-01-10T10:01:30.000Z",
+          },
+          package: {
+            type: "object",
+            properties: {
+              id: {
+                type: "string",
+                example: "pkg-uuid-456",
+              },
+              name: {
+                type: "string",
+                example: "Popular Pack",
+              },
+              basePoints: {
+                type: "number",
+                example: 1000,
+              },
+              bonusPoints: {
+                type: "number",
+                example: 200,
+              },
+            },
+          },
+        },
+      },
       Error: {
         type: "object",
         properties: {
@@ -2100,6 +2232,651 @@ export const swaggerConfig = {
               "application/json": {
                 schema: {
                   $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/packages": {
+      get: {
+        tags: ["Payments"],
+        summary: "Get point packages",
+        description:
+          "Get all available point packages and user's current points (if authenticated)",
+        security: [],
+        parameters: [
+          {
+            in: "header",
+            name: "Authorization",
+            schema: {
+              type: "string",
+            },
+            required: false,
+            description: "Optional Bearer token to get user's current points",
+            example: "Bearer your_access_token_here",
+          },
+        ],
+        responses: {
+          200: {
+            description: "Packages retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    currentPoints: {
+                      type: "number",
+                      nullable: true,
+                      example: 1250,
+                      description:
+                        "User's current points (null if not authenticated)",
+                    },
+                    packages: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/PointPackage",
+                      },
+                    },
+                  },
+                },
+                example: {
+                  success: true,
+                  currentPoints: 1250,
+                  packages: [
+                    {
+                      id: "pkg-uuid-1",
+                      name: "Starter Pack",
+                      description: "Perfect for getting started",
+                      price: 9.99,
+                      points: 500,
+                      bonusPoints: 0,
+                      totalPoints: 500,
+                      features: [
+                        "500 Exchange Points",
+                        "Valid for 6 months",
+                        "Basic support",
+                      ],
+                      validityMonths: 6,
+                      badge: null,
+                    },
+                    {
+                      id: "pkg-uuid-2",
+                      name: "Popular Pack",
+                      description: "Best value for regular users",
+                      price: 19.99,
+                      points: 1000,
+                      bonusPoints: 200,
+                      totalPoints: 1200,
+                      features: [
+                        "1,200 Exchange Points",
+                        "Valid for 12 months",
+                        "Priority support",
+                        "Bonus: 200 extra points",
+                      ],
+                      validityMonths: 12,
+                      badge: "Best Value - Save 17%",
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/create-session": {
+      post: {
+        tags: ["Payments"],
+        summary: "Create payment session",
+        description: "Create a Stripe checkout session for purchasing points",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["packageId"],
+                properties: {
+                  packageId: {
+                    type: "string",
+                    example: "pkg-uuid-123",
+                    description: "ID of the point package to purchase",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Checkout session created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Checkout session created successfully",
+                    },
+                    sessionId: {
+                      type: "string",
+                      example: "cs_test_a1b2c3d4e5f6",
+                    },
+                    sessionUrl: {
+                      type: "string",
+                      example:
+                        "https://checkout.stripe.com/pay/cs_test_a1b2c3d4e5f6",
+                    },
+                    package: {
+                      type: "object",
+                      properties: {
+                        id: {
+                          type: "string",
+                          example: "pkg-uuid-123",
+                        },
+                        name: {
+                          type: "string",
+                          example: "Popular Pack",
+                        },
+                        price: {
+                          type: "number",
+                          example: 19.99,
+                        },
+                        points: {
+                          type: "number",
+                          example: 1200,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Package ID required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Package not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/webhook": {
+      post: {
+        tags: ["Payments"],
+        summary: "Stripe webhook",
+        description:
+          "Handle Stripe webhook events (configured in Stripe Dashboard). This endpoint verifies the webhook signature and processes payment events.",
+        security: [],
+        parameters: [
+          {
+            in: "header",
+            name: "stripe-signature",
+            schema: {
+              type: "string",
+            },
+            required: true,
+            description: "Stripe webhook signature for verification",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                description: "Stripe event object",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Webhook processed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    received: {
+                      type: "boolean",
+                      example: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Invalid signature or missing header",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Webhook handler failed",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/history": {
+      get: {
+        tags: ["Payments"],
+        summary: "Get payment history",
+        description: "Get user's payment transaction history with pagination",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: "query",
+            name: "page",
+            schema: {
+              type: "integer",
+              default: 1,
+            },
+            description: "Page number",
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: {
+              type: "integer",
+              default: 10,
+            },
+            description: "Items per page",
+          },
+          {
+            in: "query",
+            name: "status",
+            schema: {
+              type: "string",
+              enum: ["pending", "completed", "failed", "refunded"],
+            },
+            description: "Filter by payment status",
+          },
+        ],
+        responses: {
+          200: {
+            description: "Payment history retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    payments: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/PaymentHistory",
+                      },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: {
+                          type: "number",
+                          example: 1,
+                        },
+                        limit: {
+                          type: "number",
+                          example: 10,
+                        },
+                        total: {
+                          type: "number",
+                          example: 25,
+                        },
+                        totalPages: {
+                          type: "number",
+                          example: 3,
+                        },
+                        hasMore: {
+                          type: "boolean",
+                          example: true,
+                        },
+                      },
+                    },
+                  },
+                },
+                example: {
+                  success: true,
+                  payments: [
+                    {
+                      id: "payment-uuid-1",
+                      packageName: "Popular Pack",
+                      packageDescription: "Best value for regular users",
+                      amount: 19.99,
+                      currency: "usd",
+                      pointsPurchased: 1200,
+                      status: "completed",
+                      createdAt: "2026-01-10T10:00:00.000Z",
+                      completedAt: "2026-01-10T10:01:30.000Z",
+                      package: {
+                        id: "pkg-uuid-2",
+                        name: "Popular Pack",
+                        basePoints: 1000,
+                        bonusPoints: 200,
+                      },
+                    },
+                  ],
+                  pagination: {
+                    page: 1,
+                    limit: 10,
+                    total: 5,
+                    totalPages: 1,
+                    hasMore: false,
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/seed-packages": {
+      post: {
+        tags: ["Admin"],
+        summary: "Seed point packages",
+        description:
+          "Seed the database with the 3 default point packages (Starter, Popular, Bulk). This will delete existing packages and create new ones. ⚠️ Use with caution in production!",
+        security: [],
+        responses: {
+          201: {
+            description: "Packages seeded successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Point packages seeded successfully",
+                    },
+                    packagesCreated: {
+                      type: "number",
+                      example: 3,
+                    },
+                    packages: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: {
+                            type: "string",
+                            example: "pkg-uuid-123",
+                          },
+                          name: {
+                            type: "string",
+                            example: "Popular Pack",
+                          },
+                          price: {
+                            type: "number",
+                            example: 19.99,
+                          },
+                          totalPoints: {
+                            type: "number",
+                            example: 1200,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                example: {
+                  success: true,
+                  message: "Point packages seeded successfully",
+                  packagesCreated: 3,
+                  packages: [
+                    {
+                      id: "pkg-uuid-1",
+                      name: "Starter Pack",
+                      price: 9.99,
+                      totalPoints: 500,
+                    },
+                    {
+                      id: "pkg-uuid-2",
+                      name: "Popular Pack",
+                      price: 19.99,
+                      totalPoints: 1200,
+                    },
+                    {
+                      id: "pkg-uuid-3",
+                      name: "Bulk Pack",
+                      price: 44.99,
+                      totalPoints: 3000,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to seed packages",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    error: {
+                      type: "string",
+                      example: "Failed to seed packages",
+                    },
+                    details: {
+                      type: "string",
+                      example: "Database connection error",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      get: {
+        tags: ["Admin"],
+        summary: "Check seeded packages",
+        description:
+          "Get a list of all seeded point packages to verify if seeding was successful",
+        security: [],
+        responses: {
+          200: {
+            description: "Packages retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    packagesCount: {
+                      type: "number",
+                      example: 3,
+                    },
+                    packages: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: {
+                            type: "string",
+                            example: "pkg-uuid-123",
+                          },
+                          name: {
+                            type: "string",
+                            example: "Popular Pack",
+                          },
+                          price: {
+                            type: "number",
+                            example: 19.99,
+                          },
+                          points: {
+                            type: "number",
+                            example: 1000,
+                          },
+                          bonusPoints: {
+                            type: "number",
+                            example: 200,
+                          },
+                          totalPoints: {
+                            type: "number",
+                            example: 1200,
+                          },
+                          isActive: {
+                            type: "boolean",
+                            example: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                example: {
+                  success: true,
+                  packagesCount: 3,
+                  packages: [
+                    {
+                      id: "pkg-uuid-1",
+                      name: "Starter Pack",
+                      price: 9.99,
+                      points: 500,
+                      bonusPoints: 0,
+                      totalPoints: 500,
+                      isActive: true,
+                    },
+                    {
+                      id: "pkg-uuid-2",
+                      name: "Popular Pack",
+                      price: 19.99,
+                      points: 1000,
+                      bonusPoints: 200,
+                      totalPoints: 1200,
+                      isActive: true,
+                    },
+                    {
+                      id: "pkg-uuid-3",
+                      name: "Bulk Pack",
+                      price: 44.99,
+                      points: 2500,
+                      bonusPoints: 500,
+                      totalPoints: 3000,
+                      isActive: true,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          500: {
+            description: "Failed to fetch packages",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    error: {
+                      type: "string",
+                      example: "Failed to fetch packages",
+                    },
+                    details: {
+                      type: "string",
+                      example: "Database connection error",
+                    },
+                  },
                 },
               },
             },

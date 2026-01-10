@@ -11,7 +11,8 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "seed:packages": "node prisma/seed-packages.js"
   },
   "dependencies": {
     "@bprogress/next": "^3.2.12",
@@ -35,6 +36,7 @@
     "react-datepicker": "^9.1.0",
     "react-dom": "19.2.3",
     "sonner": "^2.0.7",
+    "stripe": "^20.1.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-react": "^5.31.0",
     "world-countries": "^5.1.0",
