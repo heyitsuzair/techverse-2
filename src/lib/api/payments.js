@@ -11,7 +11,8 @@ import { getFromCookie } from "@/utils/cookies";
  * @returns {Promise<{currentPoints: number|null, packages: Array}>}
  */
 export const getPackages = async () => {
-  const token = typeof window !== "undefined" ? getFromCookie("accessToken") : null;
+  const token =
+    typeof window !== "undefined" ? getFromCookie("accessToken") : null;
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
   return get(endpoints.payments.packages, headers);
@@ -23,7 +24,8 @@ export const getPackages = async () => {
  * @returns {Promise<{sessionId: string, sessionUrl: string, package: object}>}
  */
 export const createCheckoutSession = async (packageId) => {
-  const token = typeof window !== "undefined" ? getFromCookie("accessToken") : null;
+  const token =
+    typeof window !== "undefined" ? getFromCookie("accessToken") : null;
 
   if (!token) {
     throw new Error("Authentication required");
