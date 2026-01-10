@@ -53,62 +53,62 @@ export default function ExchangeTracking() {
   const [showReportModal, setShowReportModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Text variant="h1" className="mb-2 flex items-center gap-3">
-            <Package className="w-8 h-8" />
+        <div className="mb-6 sm:mb-8">
+          <Text variant="h1" className="mb-2 flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl lg:text-3xl">
+            <Package className="w-6 h-6 sm:w-8 sm:h-8" />
             Track Exchange
           </Text>
-          <Text variant="body" className="text-zinc-600">
+          <Text variant="body" className="text-zinc-600 text-sm sm:text-base">
             Monitor your book exchange and delivery status
           </Text>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Status Card */}
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-20 h-24 bg-linear-to-br from-primary/10 to-secondary/10 rounded flex items-center justify-center flex-shrink-0">
-                    <Package className="w-10 h-10 text-primary" />
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                  <div className="w-16 h-20 sm:w-20 sm:h-24 bg-linear-to-br from-primary/10 to-secondary/10 rounded flex items-center justify-center flex-shrink-0">
+                    <Package className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 w-full">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-2 mb-2 sm:mb-2">
                       <div>
-                        <Text variant="h3" className="mb-1">{MOCK_EXCHANGE.book.title}</Text>
-                        <Text variant="body" className="text-zinc-600">
+                        <Text variant="h3" className="mb-1 text-lg sm:text-xl">{MOCK_EXCHANGE.book.title}</Text>
+                        <Text variant="body" className="text-zinc-600 text-sm sm:text-base">
                           by {MOCK_EXCHANGE.book.author}
                         </Text>
                       </div>
-                      <Badge variant="warning">
+                      <Badge variant="warning" className="self-start">
                         <Truck className="w-3 h-3 mr-1" />
                         In Transit
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
                       <div>
-                        <Text variant="caption" className="text-zinc-600">Exchange Partner</Text>
-                        <Text variant="body" className="font-semibold">
+                        <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">Exchange Partner</Text>
+                        <Text variant="body" className="font-semibold text-sm sm:text-base">
                           {MOCK_EXCHANGE.partner.name}
                         </Text>
                       </div>
                       <div>
-                        <Text variant="caption" className="text-zinc-600">Tracking Number</Text>
-                        <Text variant="body" className="font-mono text-sm">
+                        <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">Tracking Number</Text>
+                        <Text variant="body" className="font-mono text-xs sm:text-sm break-all">
                           {MOCK_EXCHANGE.trackingNumber}
                         </Text>
                       </div>
                       <div>
-                        <Text variant="caption" className="text-zinc-600">Shipped On</Text>
-                        <Text variant="body">{MOCK_EXCHANGE.shippedDate}</Text>
+                        <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">Shipped On</Text>
+                        <Text variant="body" className="text-sm sm:text-base">{MOCK_EXCHANGE.shippedDate}</Text>
                       </div>
                       <div>
-                        <Text variant="caption" className="text-zinc-600">Est. Delivery</Text>
-                        <Text variant="body" className="text-primary font-semibold">
+                        <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">Est. Delivery</Text>
+                        <Text variant="body" className="text-primary font-semibold text-sm sm:text-base">
                           {MOCK_EXCHANGE.estimatedDelivery}
                         </Text>
                       </div>

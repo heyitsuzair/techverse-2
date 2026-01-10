@@ -88,47 +88,47 @@ export default function QRBookHistory() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Text variant="h1" className="mb-2 flex items-center gap-3">
-            <QrCode className="w-8 h-8" />
+        <div className="mb-6 sm:mb-8">
+          <Text variant="h1" className="mb-2 flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl lg:text-3xl">
+            <QrCode className="w-6 h-6 sm:w-8 sm:h-8" />
             Book Journey History
           </Text>
-          <Text variant="body" className="text-zinc-600">
+          <Text variant="body" className="text-zinc-600 text-sm sm:text-base">
             Track where this book has traveled and add your reading experience
           </Text>
         </div>
 
         {/* Book Info Card */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="w-24 h-32 bg-linear-to-br from-primary/10 to-secondary/10 rounded flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-12 h-12 text-primary" />
+        <Card className="mb-4 sm:mb-6">
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+              <div className="w-20 h-28 sm:w-24 sm:h-32 bg-linear-to-br from-primary/10 to-secondary/10 rounded flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
               </div>
-              <div className="flex-1">
-                <Text variant="h2" className="mb-1">{MOCK_BOOK_HISTORY.book.title}</Text>
-                <Text variant="body" className="text-zinc-600 mb-4">
+              <div className="flex-1 w-full">
+                <Text variant="h2" className="mb-1 text-lg sm:text-xl lg:text-2xl">{MOCK_BOOK_HISTORY.book.title}</Text>
+                <Text variant="body" className="text-zinc-600 mb-3 sm:mb-4 text-sm sm:text-base">
                   by {MOCK_BOOK_HISTORY.book.author}
                 </Text>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                   <div className="flex items-center gap-2">
-                    <QrCode className="w-4 h-4 text-zinc-500" />
-                    <Text variant="caption" className="text-zinc-600">
+                    <QrCode className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                    <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm break-all">
                       QR: {MOCK_BOOK_HISTORY.book.qrCode}
                     </Text>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-zinc-500" />
-                    <Text variant="caption" className="text-zinc-600">
+                    <MapPin className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                    <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">
                       {MOCK_BOOK_HISTORY.readingLog.length} cities visited
                     </Text>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-zinc-500" />
-                    <Text variant="caption" className="text-zinc-600">
+                    <Clock className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                    <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">
                       Total: {MOCK_BOOK_HISTORY.readingLog.reduce((sum, log) => {
                         return sum + parseInt(log.duration);
                       }, 0)} days read
@@ -137,7 +137,7 @@ export default function QRBookHistory() {
                 </div>
               </div>
               {!isAddingEntry && (
-                <Button variant="primary" onClick={() => setIsAddingEntry(true)}>
+                <Button variant="primary" onClick={() => setIsAddingEntry(true)} className="w-full sm:w-auto text-sm sm:text-base">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Entry
                 </Button>
@@ -148,14 +148,14 @@ export default function QRBookHistory() {
 
         {/* Add New Entry Form */}
         {isAddingEntry && (
-          <Card className="mb-6 border-2 border-primary">
+          <Card className="mb-4 sm:mb-6 border-2 border-primary">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Edit2 className="w-5 h-5" />
+              <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <span className="flex items-center gap-2 text-base sm:text-lg">
+                  <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   Add Your Reading Entry
                 </span>
-                <Button variant="ghost" size="sm" onClick={() => setIsAddingEntry(false)}>
+                <Button variant="ghost" size="sm" onClick={() => setIsAddingEntry(false)} className="text-sm">
                   Cancel
                 </Button>
               </CardTitle>
@@ -235,18 +235,18 @@ export default function QRBookHistory() {
 
         {/* Reading History Timeline */}
         <div>
-          <Text variant="h3" className="mb-4">Reading Journey</Text>
-          <div className="space-y-4">
+          <Text variant="h3" className="mb-3 sm:mb-4 text-lg sm:text-xl">Reading Journey</Text>
+          <div className="space-y-3 sm:space-y-4">
             {MOCK_BOOK_HISTORY.readingLog.map((log, index) => (
               <Card key={log.id}>
-                <CardContent className="pt-6">
-                  <div className="flex gap-4">
+                <CardContent className="pt-4 sm:pt-6">
+                  <div className="flex gap-3 sm:gap-4">
                     {/* Timeline Marker */}
-                    <div className="flex flex-col items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    <div className="flex flex-col items-center flex-shrink-0">
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
                         index === 0 ? "bg-primary/10" : "bg-zinc-100"
                       }`}>
-                        <MapPin className={`w-5 h-5 ${index === 0 ? "text-primary" : "text-zinc-500"}`} />
+                        <MapPin className={`w-4 h-4 sm:w-5 sm:h-5 ${index === 0 ? "text-primary" : "text-zinc-500"}`} />
                       </div>
                       {index < MOCK_BOOK_HISTORY.readingLog.length - 1 && (
                         <div className="w-0.5 h-full min-h-[60px] bg-zinc-200 mt-2" />
@@ -254,37 +254,37 @@ export default function QRBookHistory() {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 pb-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <Text variant="h4" className="mb-1 flex items-center gap-2">
-                            {log.city}
-                            {index === 0 && <Badge variant="primary">Current</Badge>}
+                    <div className="flex-1 pb-3 sm:pb-4 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-0 mb-2">
+                        <div className="min-w-0">
+                          <Text variant="h4" className="mb-1 flex items-center gap-2 text-base sm:text-lg flex-wrap">
+                            <span className="truncate">{log.city}</span>
+                            {index === 0 && <Badge variant="primary" className="text-xs flex-shrink-0">Current</Badge>}
                           </Text>
-                          <Text variant="caption" className="text-zinc-600">
+                          <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">
                             Read by {log.reader}
                           </Text>
                         </div>
-                        <Text variant="caption" className="text-zinc-600">
+                        <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm flex-shrink-0">
                           {log.duration}
                         </Text>
                       </div>
 
-                      <div className="flex items-center gap-4 mb-3 text-sm text-zinc-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3 text-xs sm:text-sm text-zinc-600">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <Text variant="caption">{log.startDate}</Text>
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <Text variant="caption" className="text-xs sm:text-sm">{log.startDate}</Text>
                         </div>
-                        <Text variant="caption">→</Text>
+                        <Text variant="caption" className="hidden sm:inline text-xs sm:text-sm">→</Text>
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <Text variant="caption">{log.endDate}</Text>
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <Text variant="caption" className="text-xs sm:text-sm">{log.endDate}</Text>
                         </div>
                       </div>
 
                       {log.notes && (
-                        <div className="bg-zinc-50 rounded-lg p-3 border border-zinc-200">
-                          <Text variant="body" className="text-sm italic text-zinc-700">
+                        <div className="bg-zinc-50 rounded-lg p-2.5 sm:p-3 border border-zinc-200">
+                          <Text variant="body" className="text-xs sm:text-sm italic text-zinc-700">
                             "{log.notes}"
                           </Text>
                         </div>
@@ -296,29 +296,6 @@ export default function QRBookHistory() {
             ))}
           </div>
         </div>
-
-        {/* Book Journey Map (Placeholder) */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
-              Journey Map
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-zinc-100 rounded-lg h-64 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-12 h-12 text-zinc-400 mx-auto mb-2" />
-                <Text variant="body" className="text-zinc-600">
-                  Interactive map showing all cities this book has visited
-                </Text>
-                <Text variant="caption" className="text-zinc-500">
-                  Coming soon
-                </Text>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

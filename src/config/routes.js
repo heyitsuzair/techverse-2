@@ -9,6 +9,7 @@ export default {
   dashboard: {
     index: "/dashboard",
     profile: "/dashboard/profile",
+    settings: "/dashboard/settings",
     books: {
       add: "/dashboard/books/add",
       myBooks: "/dashboard/books/my-books",

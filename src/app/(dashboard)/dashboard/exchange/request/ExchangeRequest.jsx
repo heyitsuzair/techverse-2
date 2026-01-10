@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { 
   Card, 
   CardHeader, 
@@ -49,81 +50,87 @@ export default function ExchangeRequest() {
 
   if (confirmed) {
     return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-        <Card className="max-w-md w-full mx-4">
-          <CardContent className="pt-6 text-center">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
-            </div>
-            <Text variant="h2" className="mb-2">Request Sent!</Text>
-            <Text variant="body" className="text-zinc-600 mb-6">
-              Your exchange request has been sent to {MOCK_BOOK_REQUEST.owner.name}. 
-              You'll be notified when they respond.
-            </Text>
-
-            <div className="bg-zinc-50 rounded-lg p-4 mb-6 text-left">
-              <Text variant="caption" className="text-zinc-600 mb-2">Request Summary</Text>
-              <Text variant="h4" className="mb-1">{MOCK_BOOK_REQUEST.title}</Text>
-              <Text variant="body" className="text-zinc-600 mb-3">by {MOCK_BOOK_REQUEST.author}</Text>
-              <div className="flex items-center justify-between">
-                <Text variant="caption" className="text-zinc-600">Points Reserved</Text>
-                <Text variant="body" className="font-bold text-amber-600">
-                  {MOCK_BOOK_REQUEST.pointsRequired} pts
-                </Text>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center min-h-[calc(100vh-12rem)]">
+          <Card className="max-w-md w-full">
+            <CardContent className="pt-6 text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
               </div>
-            </div>
+              <Text variant="h2" className="mb-2 text-xl sm:text-2xl">Request Sent!</Text>
+              <Text variant="body" className="text-zinc-600 mb-4 sm:mb-6 text-sm sm:text-base">
+                Your exchange request has been sent to {MOCK_BOOK_REQUEST.owner.name}. 
+                You'll be notified when they respond.
+              </Text>
 
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1">
-                View My Requests
-              </Button>
-              <Button variant="primary" className="flex-1">
-                Back to Marketplace
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="bg-zinc-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 text-left">
+                <Text variant="caption" className="text-zinc-600 mb-2 text-xs sm:text-sm">Request Summary</Text>
+                <Text variant="h4" className="mb-1 text-base sm:text-lg">{MOCK_BOOK_REQUEST.title}</Text>
+                <Text variant="body" className="text-zinc-600 mb-3 text-sm">by {MOCK_BOOK_REQUEST.author}</Text>
+                <div className="flex items-center justify-between">
+                  <Text variant="caption" className="text-zinc-600 text-xs sm:text-sm">Points Reserved</Text>
+                  <Text variant="body" className="font-bold text-amber-600 text-sm sm:text-base">
+                    {MOCK_BOOK_REQUEST.pointsRequired} pts
+                  </Text>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Link href="/dashboard/exchange/tracking">
+                  <Button variant="outline" className="w-full">
+                    View My Requests
+                  </Button>
+                </Link>
+                <Link href="/dashboard/marketplace">
+                  <Button variant="primary" className="w-full">
+                    Back to Marketplace
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Text variant="h1" className="mb-2">
+        <div className="mb-6 sm:mb-8">
+          <Text variant="h1" className="mb-2 text-xl sm:text-2xl lg:text-3xl">
             Request Book Exchange
           </Text>
-          <Text variant="body" className="text-zinc-600">
+          <Text variant="body" className="text-zinc-600 text-sm sm:text-base">
             Review the details and confirm your exchange request
           </Text>
         </div>
 
         {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-4 mb-8">
+        <div className="flex items-center justify-between sm:justify-center gap-2 sm:gap-4 mb-6 sm:mb-8 overflow-x-auto pb-2">
           {[
             { num: 1, label: "Review" },
             { num: 2, label: "Message" },
             { num: 3, label: "Confirm" }
           ].map((s, idx) => (
-            <div key={s.num} className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+            <div key={s.num} className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${
                   step >= s.num ? "bg-primary text-primary-foreground" : "bg-zinc-200 text-zinc-600"
                 }`}>
                   {s.num}
                 </div>
-                <Text variant="caption" className={step >= s.num ? "text-primary font-semibold" : "text-zinc-600"}>
+                <Text variant="caption" className={`text-xs sm:text-sm whitespace-nowrap ${step >= s.num ? "text-primary font-semibold" : "text-zinc-600"}`}>
                   {s.label}
                 </Text>
               </div>
-              {idx < 2 && <div className={`w-12 h-0.5 ${step > s.num ? "bg-primary" : "bg-zinc-200"}`} />}
+              {idx < 2 && <div className={`w-6 sm:w-12 h-0.5 ${step > s.num ? "bg-primary" : "bg-zinc-200"}`} />}
             </div>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Card>

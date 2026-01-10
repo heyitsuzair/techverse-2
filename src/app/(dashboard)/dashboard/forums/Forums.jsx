@@ -26,7 +26,7 @@ import {
   Send
 } from "lucide-react";
 
-// Mock Data
+// Mock Data - User's Interacted Forums (will be replaced with API data)
 const MOCK_POSTS = [
   {
     id: 1,
@@ -41,18 +41,6 @@ const MOCK_POSTS = [
     trending: true
   },
   {
-    id: 2,
-    title: "Looking for recommendations: Books like 'The Alchemist'",
-    author: "Anonymous",
-    isAnonymous: true,
-    content: "I loved the philosophical journey in The Alchemist. Any similar books that explore self-discovery and following your dreams?",
-    category: "Recommendations",
-    likes: 18,
-    comments: 23,
-    timeAgo: "5 hours ago",
-    trending: false
-  },
-  {
     id: 3,
     title: "Book Club: Classic Literature Discussion",
     author: "John D.",
@@ -63,26 +51,11 @@ const MOCK_POSTS = [
     comments: 31,
     timeAgo: "1 day ago",
     trending: true
-  },
-  {
-    id: 4,
-    title: "Unpopular opinion: Overrated bestsellers",
-    author: "Anonymous",
-    isAnonymous: true,
-    content: "Am I the only one who finds some bestsellers disappointing? Let's discuss books that didn't live up to the hype.",
-    category: "Discussion",
-    likes: 67,
-    comments: 89,
-    timeAgo: "2 days ago",
-    trending: true
   }
 ];
 
-const CATEGORIES = ["All", "Discussion", "Recommendations", "Book Club", "Reviews", "General"];
-
 export default function Forums() {
   const [showCreatePost, setShowCreatePost] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [newPost, setNewPost] = useState({
     title: "",
@@ -92,6 +65,12 @@ export default function Forums() {
   });
   const [expandedPost, setExpandedPost] = useState(null);
 
+  const filteredPosts = MOCK_POSTS.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
+
   const handleCreatePost = (e) => {
     e.preventDefault();
     // Create post logic here
@@ -99,26 +78,18 @@ export default function Forums() {
     setNewPost({ title: "", content: "", category: "Discussion", anonymous: false });
   };
 
-  const filteredPosts = MOCK_POSTS.filter(post => {
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.content.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <Text variant="h1" className="mb-2 flex items-center gap-3">
                 <MessageSquare className="w-8 h-8" />
-                Book Forums
+                My Forums
               </Text>
               <Text variant="body" className="text-zinc-600">
-                Join discussions, share recommendations, and connect with fellow readers
+                Forums you've participated in
               </Text>
             </div>
             <Button variant="primary" onClick={() => setShowCreatePost(!showCreatePost)}>
@@ -199,53 +170,25 @@ export default function Forums() {
           </Card>
         )}
 
-        <div className="grid lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle>Categories</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {CATEGORIES.map((category) => (
-                    <Button
-                      key={category}
-                      variant="ghost"
-                      onClick={() => setSelectedCategory(category)}
-                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                        selectedCategory === category
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "hover:bg-zinc-100 text-zinc-700"
-                      }`}
-                    >
-                      {category}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Main Content */}
+        <div className="space-y-6">
+          {/* Search */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                <Input
+                  placeholder="Search your forums..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Search and Filter */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
-                  <Input
-                    placeholder="Search posts..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Posts List */}
-            <div className="space-y-4">
+          {/* Posts List */}
+          <div className="space-y-4">
               {filteredPosts.map((post) => (
                 <Card key={post.id} className={post.trending ? "border-l-4 border-l-orange-500" : ""}>
                   <CardContent className="pt-6">
@@ -344,9 +287,9 @@ export default function Forums() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <MessageSquare className="w-16 h-16 text-zinc-400 mx-auto mb-4" />
-                  <Text variant="h3" className="mb-2">No posts found</Text>
+                  <Text variant="h3" className="mb-2">No forums found</Text>
                   <Text variant="body" className="text-zinc-600 mb-4">
-                    Try adjusting your search or create a new post
+                    You haven't participated in any forums yet
                   </Text>
                   <Button variant="primary" onClick={() => setShowCreatePost(true)}>
                     Create First Post
@@ -354,9 +297,7 @@ export default function Forums() {
                 </CardContent>
               </Card>
             )}
-          </div>
         </div>
-      </div>
     </div>
   );
 }

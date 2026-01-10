@@ -84,7 +84,7 @@ export default function AddBook() {
 
   if (generatedQR) {
     return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md w-full mx-4">
           <CardContent className="pt-6">
             <div className="text-center">
@@ -141,38 +141,38 @@ export default function AddBook() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Text variant="h1" className="mb-2 flex items-center gap-3">
-            <BookOpen className="w-8 h-8" />
+        <div className="mb-6 sm:mb-8">
+          <Text variant="h1" className="mb-2 flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl lg:text-3xl">
+            <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" />
             Add a New Book
           </Text>
-          <Text variant="body" className="text-zinc-600">
+          <Text variant="body" className="text-zinc-600 text-sm sm:text-base">
             Fill in the details below to list your book on the marketplace
           </Text>
         </div>
 
         {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-4 mb-8">
+        <div className="flex items-center justify-between sm:justify-center gap-2 sm:gap-4 mb-6 sm:mb-8 overflow-x-auto pb-2">
           {[
             { num: 1, label: "Book Details" },
             { num: 2, label: "Upload Images" },
             { num: 3, label: "Location" }
           ].map((s, idx) => (
-            <div key={s.num} className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+            <div key={s.num} className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${
                   step >= s.num ? "bg-blue-600 text-white" : "bg-zinc-200 text-zinc-600"
                 }`}>
                   {s.num}
                 </div>
-                <Text variant="caption" className={step >= s.num ? "text-blue-600 font-semibold" : "text-zinc-600"}>
+                <Text variant="caption" className={`text-xs sm:text-sm whitespace-nowrap ${step >= s.num ? "text-blue-600 font-semibold" : "text-zinc-600"}`}>
                   {s.label}
                 </Text>
               </div>
-              {idx < 2 && <div className={`w-12 h-0.5 ${step > s.num ? "bg-blue-600" : "bg-zinc-200"}`} />}
+              {idx < 2 && <div className={`w-6 sm:w-12 h-0.5 ${step > s.num ? "bg-blue-600" : "bg-zinc-200"}`} />}
             </div>
           ))}
         </div>
@@ -234,24 +234,27 @@ export default function AddBook() {
                       {BOOK_CONDITIONS.map((condition) => (
                         <label
                           key={condition.value}
-                          className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                          className={`border-2 rounded-lg p-4 cursor-pointer transition-all flex items-start ${
                             formData.condition === condition.value
                               ? "border-blue-600 bg-blue-50"
                               : "border-zinc-200 hover:border-zinc-300"
                           }`}
                         >
-                          <Radio
+                          <input
+                            type="radio"
                             name="condition"
                             value={condition.value}
                             checked={formData.condition === condition.value}
                             onChange={(e) => handleChange("condition", e.target.value)}
-                            className="mr-3"
+                            className="w-4 h-4 mt-1 text-primary border-zinc-300 focus:outline-none focus:ring-0 cursor-pointer accent-primary flex-shrink-0"
                             required
                           />
-                          <span className="font-semibold">{condition.label}</span>
-                          <Text variant="caption" className="block text-zinc-600 mt-1 ml-6">
-                            {condition.description}
-                          </Text>
+                          <div className="ml-3 flex-1">
+                            <span className="font-semibold block">{condition.label}</span>
+                            <Text variant="caption" className="block text-zinc-600 mt-1">
+                              {condition.description}
+                            </Text>
+                          </div>
                         </label>
                       ))}
                     </div>
