@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Textarea, Button, Spinner, AddressAutocomplete } from "@/components/ui";
+import {
+  Input,
+  Textarea,
+  Button,
+  Spinner,
+  AddressAutocomplete,
+} from "@/components/ui";
 import uploadToCloudinary from "@/utils/uploadToCloudinary";
 import deleteFromCloudinary from "@/utils/deleteFromCloudinary";
+import { getFromCookie } from "@/utils/cookies";
 
 export default function AddStallModal({
   isOpen,
@@ -206,7 +213,8 @@ export default function AddStallModal({
         throw new Error("Location coordinates are required");
       }
 
-      const token = localStorage.getItem("token");
+      // Get token from cookies
+      const token = getFromCookie("accessToken");
       if (!token) {
         throw new Error("Please login to continue");
       }
@@ -262,7 +270,9 @@ export default function AddStallModal({
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">{editStall ? "Edit Exchange Stall" : "Add Exchange Stall"}</h2>
+          <h2 className="text-2xl font-bold">
+            {editStall ? "Edit Exchange Stall" : "Add Exchange Stall"}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -565,7 +575,10 @@ export default function AddStallModal({
               className="flex-1"
             >
               {loading ? (
-                <Spinner size="sm" />
+                <span className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  {editStall ? "Updating..." : "Adding..."}
+                </span>
               ) : editStall ? (
                 "Update Stall"
               ) : (

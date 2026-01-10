@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, Button, Spinner, Badge } from "@/components/ui";
 import AddStallModal from "@/app/(main)/exchange-points/AddStallModal";
+import { getFromCookie } from "@/utils/cookies";
 
 export default function MyStalls() {
   const [stalls, setStalls] = useState([]);
@@ -21,7 +22,7 @@ export default function MyStalls() {
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("token");
+      const token = getFromCookie("accessToken");
       if (!token) {
         throw new Error("Please login to continue");
       }
@@ -59,7 +60,7 @@ export default function MyStalls() {
     try {
       setDeletingId(stallId);
 
-      const token = localStorage.getItem("token");
+      const token = getFromCookie("accessToken");
       const response = await fetch(`/api/stalls/${stallId}`, {
         method: "DELETE",
         headers: {
