@@ -212,10 +212,3 @@ async function handleChargeRefunded(charge) {
     console.error("Error handling charge.refunded:", error);
   }
 }
-
-// Disable body parsing for webhook
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

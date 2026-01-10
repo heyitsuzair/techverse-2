@@ -35,32 +35,39 @@ const mapOptions = {
   ],
 };
 
-export default function MapView({ stalls, selectedStall, onSelectStall }) {
+export default function MapView({
+  stalls,
+  selectedStall,
+  onSelectStall,
+  userLocation,
+}) {
   const [activeMarker, setActiveMarker] = useState(null);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
-  // Convert stalls to map markers with coordinates
+  // Convert stalls to map markers with real coordinates from database
   const markers = useMemo(() => {
-    return stalls.map((stall, index) => {
-      // Mock coordinates around NYC - in production, these would come from your database
-      const baseCoordinates = [
-        { lat: 40.7128, lng: -74.006 },
-        { lat: 40.7489, lng: -73.9681 },
-        { lat: 40.6782, lng: -73.9442 },
-        { lat: 40.7282, lng: -73.7949 },
-        { lat: 40.7614, lng: -73.9776 },
-        { lat: 40.6413, lng: -74.0822 },
-      ];
-
-      return {
-        ...stall,
-        position: baseCoordinates[index % baseCoordinates.length],
-      };
-    });
+    return stalls.map((stall) => ({
+      ...stall,
+      position: {
+        lat: stall.locationLat,
+        lng: stall.locationLng,
+      },
+    }));
   }, [stalls]);
+
+  // Calculate map center based on user location or first stall
+  const mapCenter = useMemo(() => {
+    if (userLocation) {
+      return userLocation;
+    }
+    if (markers.length > 0) {
+      return markers[0].position;
+    }
+    return defaultCenter;
+  }, [userLocation, markers]);
 
   const onMapClick = useCallback(() => {
     setActiveMarker(null);
@@ -103,14 +110,30 @@ export default function MapView({ stalls, selectedStall, onSelectStall }) {
   }
 
   return (
-    <div className="relative w-full h-full min-h-[600px] rounded-lg overflow-hidden shadow-lg">
+    <div className="relative w-full h-full min-h-150 rounded-lg overflow-hidden shadow-lg">
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={12}
-        center={defaultCenter}
+        center={mapCenter}
         options={mapOptions}
         onClick={onMapClick}
       >
+        {/* User location marker */}
+        {userLocation && (
+          <Marker
+            position={userLocation}
+            icon={{
+              path: "M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0",
+              fillColor: "#3b82f6",
+              fillOpacity: 0.3,
+              strokeColor: "#2563eb",
+              strokeWeight: 3,
+              scale: 2,
+              anchor: new window.google.maps.Point(12, 12),
+            }}
+          />
+        )}
+
         {markers.map((stall) => (
           <Marker
             key={stall.id}
@@ -138,36 +161,38 @@ export default function MapView({ stalls, selectedStall, onSelectStall }) {
               >
                 <div className="p-2 max-w-xs">
                   <div className="flex gap-3">
-                    <img
-                      src={stall.imageUrl}
-                      alt={stall.name}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
+                    {stall.photos && stall.photos.length > 0 && (
+                      <img
+                        src={stall.photos[0]}
+                        alt={stall.name}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    )}
                     <div className="flex-1">
                       <h4 className="font-bold text-slate-900 text-sm mb-1">
                         {stall.name}
                       </h4>
-                      <div className="flex items-center gap-1 mb-1">
-                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs font-semibold">
-                          {stall.rating}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          ({stall.reviews})
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{stall.hours}</span>
-                      </div>
-                      {stall.isOpen && (
+                      {stall.operatingHours && (
+                        <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{stall.operatingHours}</span>
+                        </div>
+                      )}
+                      {stall.distance && (
+                        <div className="text-xs text-slate-600 mb-1">
+                          📍 {stall.distance.toFixed(1)} km away
+                        </div>
+                      )}
+                      {stall.isActive && (
                         <Badge variant="success" size="sm">
                           Open Now
                         </Badge>
                       )}
                     </div>
                   </div>
-                  <p className="text-xs text-slate-600 mt-2">{stall.address}</p>
+                  <p className="text-xs text-slate-600 mt-2">
+                    {stall.locationAddress}
+                  </p>
                 </div>
               </InfoWindow>
             )}

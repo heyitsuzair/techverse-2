@@ -25,32 +25,39 @@ import {
   Search,
   LogOut,
   ChevronDown,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: routes.dashboard.index, icon: LayoutDashboard },
-  { 
-    name: "Books", 
+  {
+    name: "Books",
     icon: BookOpen,
     children: [
       { name: "Add Book", href: routes.dashboard.books.add },
       { name: "My Books", href: routes.dashboard.books.myBooks },
       { name: "QR History", href: routes.dashboard.books.qrHistory },
-    ]
+    ],
   },
   { name: "Marketplace", href: routes.marketplace, icon: Store },
   { name: "Wishlist", href: routes.dashboard.wishlist, icon: Heart },
-  { 
-    name: "Exchange", 
+  {
+    name: "Exchange",
     icon: ArrowLeftRight,
     children: [
       { name: "Request Exchange", href: routes.dashboard.exchange.request },
       { name: "Track Exchange", href: routes.dashboard.exchange.tracking },
-    ]
+    ],
   },
   { name: "Buy Points", href: routes.dashboard.points.buy, icon: Coins },
-  { name: "Add Stall", href: routes.dashboard.stalls.add, icon: MapPin },
+  {
+    name: "Stalls",
+    icon: MapPin,
+    children: [
+      { name: "Add Stall", href: routes.dashboard.stalls.add },
+      { name: "My Stalls", href: routes.dashboard.stalls.myStalls },
+    ],
+  },
   { name: "Forums", href: routes.dashboard.forums, icon: MessageSquare },
   { name: "Messages", href: routes.dashboard.messages, icon: Mail },
 ];
@@ -83,9 +90,9 @@ export default function DashboardLayout({ children }) {
   };
 
   const toggleExpanded = (name) => {
-    setExpandedItems(prev => ({
+    setExpandedItems((prev) => ({
       ...prev,
-      [name]: !prev[name]
+      [name]: !prev[name],
     }));
   };
 
@@ -94,18 +101,18 @@ export default function DashboardLayout({ children }) {
     {
       id: 1,
       title: "New Exchange Request",
-      message: "Sarah wants to exchange \"1984\" for your book",
+      message: 'Sarah wants to exchange "1984" for your book',
       time: "5 min ago",
       read: false,
-      type: "exchange"
+      type: "exchange",
     },
     {
       id: 2,
       title: "Book Added to Wishlist",
-      message: "Someone added your \"The Great Gatsby\" to their wishlist",
+      message: 'Someone added your "The Great Gatsby" to their wishlist',
       time: "1 hour ago",
       read: false,
-      type: "wishlist"
+      type: "wishlist",
     },
     {
       id: 3,
@@ -113,15 +120,15 @@ export default function DashboardLayout({ children }) {
       message: "Your exchange with John has been completed successfully",
       time: "2 hours ago",
       read: true,
-      type: "success"
+      type: "success",
     },
     {
       id: 4,
       title: "New Forum Reply",
-      message: "Alex replied to your post in \"Book Recommendations\"",
+      message: 'Alex replied to your post in "Book Recommendations"',
       time: "1 day ago",
       read: true,
-      type: "forum"
+      type: "forum",
     },
   ];
 
@@ -130,9 +137,14 @@ export default function DashboardLayout({ children }) {
       {/* Sidebar for desktop */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-zinc-200 bg-background px-6">
-          <LinkWithProgress href={routes.home} className="flex h-16 shrink-0 items-center border-b border-zinc-200 -mx-6 px-6 cursor-pointer hover:opacity-80 transition-opacity">
+          <LinkWithProgress
+            href={routes.home}
+            className="flex h-16 shrink-0 items-center border-b border-zinc-200 -mx-6 px-6 cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <BookOpen className="h-8 w-8 text-primary" />
-            <span className="ml-2 text-xl font-bold text-foreground">BookExchange</span>
+            <span className="ml-2 text-xl font-bold text-foreground">
+              BookExchange
+            </span>
           </LinkWithProgress>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -155,8 +167,14 @@ export default function DashboardLayout({ children }) {
                             className="w-full group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-foreground/70 hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
                           >
                             <item.icon className="h-6 w-6 shrink-0" />
-                            <span className="flex-1 text-left">{item.name}</span>
-                            <ChevronDown className={`h-4 w-4 transition-transform ${expandedItems[item.name] ? 'rotate-180' : ''}`} />
+                            <span className="flex-1 text-left">
+                              {item.name}
+                            </span>
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform ${
+                                expandedItems[item.name] ? "rotate-180" : ""
+                              }`}
+                            />
                           </button>
                           <AnimatePresence>
                             {expandedItems[item.name] && (
@@ -218,7 +236,7 @@ export default function DashboardLayout({ children }) {
               className="fixed inset-0 bg-zinc-900/80 z-50 lg:hidden"
               onClick={() => setSidebarOpen(false)}
             />
-            
+
             {/* Sidebar */}
             <div className="fixed inset-0 flex z-50 lg:hidden pointer-events-none">
               <motion.div
@@ -229,14 +247,24 @@ export default function DashboardLayout({ children }) {
                 className="relative mr-16 flex w-full max-w-xs flex-1 pointer-events-auto"
               >
                 <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <Button onClick={() => setSidebarOpen(false)} variant="ghost" className="-m-2.5 p-2.5">
+                  <Button
+                    onClick={() => setSidebarOpen(false)}
+                    variant="ghost"
+                    className="-m-2.5 p-2.5"
+                  >
                     <X className="h-6 w-6 text-white" />
                   </Button>
                 </div>
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-background px-6 pb-2">
-                  <LinkWithProgress href={routes.home} className="flex h-16 shrink-0 items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSidebarOpen(false)}>
+                  <LinkWithProgress
+                    href={routes.home}
+                    className="flex h-16 shrink-0 items-center cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => setSidebarOpen(false)}
+                  >
                     <BookOpen className="h-8 w-8 text-primary" />
-                    <span className="ml-2 text-xl font-bold text-foreground">BookExchange</span>
+                    <span className="ml-2 text-xl font-bold text-foreground">
+                      BookExchange
+                    </span>
                   </LinkWithProgress>
                   <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -260,8 +288,16 @@ export default function DashboardLayout({ children }) {
                                     className="w-full group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-foreground/70 hover:text-primary hover:bg-primary/5 cursor-pointer"
                                   >
                                     <item.icon className="h-6 w-6 shrink-0" />
-                                    <span className="flex-1 text-left">{item.name}</span>
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${expandedItems[item.name] ? 'rotate-180' : ''}`} />
+                                    <span className="flex-1 text-left">
+                                      {item.name}
+                                    </span>
+                                    <ChevronDown
+                                      className={`h-4 w-4 transition-transform ${
+                                        expandedItems[item.name]
+                                          ? "rotate-180"
+                                          : ""
+                                      }`}
+                                    />
                                   </button>
                                   <AnimatePresence>
                                     {expandedItems[item.name] && (
@@ -278,7 +314,9 @@ export default function DashboardLayout({ children }) {
                                               <LinkWithProgress
                                                 href={child.href}
                                                 className="block rounded-md py-2 pr-2 pl-3 text-sm leading-6 text-foreground/60 hover:text-primary hover:bg-primary/5"
-                                                onClick={() => setSidebarOpen(false)}
+                                                onClick={() =>
+                                                  setSidebarOpen(false)
+                                                }
                                               >
                                                 {child.name}
                                               </LinkWithProgress>
@@ -319,7 +357,11 @@ export default function DashboardLayout({ children }) {
           <div className="h-6 w-px bg-zinc-200 lg:hidden" />
 
           <div className="flex flex-1 gap-x-2 sm:gap-x-3 self-stretch min-w-0">
-            <form className="relative flex flex-1 items-center min-w-0" action="#" method="GET">
+            <form
+              className="relative flex flex-1 items-center min-w-0"
+              action="#"
+              method="GET"
+            >
               <div className="relative w-full max-w-2xl">
                 <Search className="pointer-events-none absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-foreground/40" />
                 <input
@@ -332,13 +374,13 @@ export default function DashboardLayout({ children }) {
             </form>
             <div className="flex items-center gap-x-2 sm:gap-x-3">
               <div className="relative flex items-center">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="p-2 text-foreground/40 hover:text-foreground/60 relative flex items-center justify-center"
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
                 >
                   <Bell className="h-5 w-5" />
-                  {notifications.filter(n => !n.read).length > 0 && (
+                  {notifications.filter((n) => !n.read).length > 0 && (
                     <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-600" />
                   )}
                 </Button>
@@ -348,11 +390,11 @@ export default function DashboardLayout({ children }) {
                   {notificationsOpen && (
                     <>
                       {/* Backdrop */}
-                      <div 
-                        className="fixed inset-0 z-40" 
+                      <div
+                        className="fixed inset-0 z-40"
                         onClick={() => setNotificationsOpen(false)}
                       />
-                      
+
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -363,10 +405,12 @@ export default function DashboardLayout({ children }) {
                         <div className="rounded-lg bg-background shadow-lg ring-1 ring-zinc-200 overflow-hidden">
                           {/* Header */}
                           <div className="px-4 py-3 border-b border-zinc-200 flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <h3 className="text-sm font-semibold text-foreground">
+                              Notifications
+                            </h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               className="text-xs h-auto p-1 text-primary hover:text-primary/80"
                               onClick={() => setNotificationsOpen(false)}
                             >
@@ -381,28 +425,28 @@ export default function DashboardLayout({ children }) {
                                 <div
                                   key={notification.id}
                                   className={`px-4 py-3 border-b border-zinc-100 hover:bg-zinc-50 cursor-pointer transition-colors ${
-                                    !notification.read ? 'bg-primary/5' : ''
+                                    !notification.read ? "bg-primary/5" : ""
                                   }`}
                                   onClick={() => setNotificationsOpen(false)}
                                 >
                                   <div className="flex gap-3">
                                     <div className="flex-shrink-0 mt-0.5">
-                                      {notification.type === 'exchange' && (
+                                      {notification.type === "exchange" && (
                                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                                           <ArrowLeftRight className="w-4 h-4 text-blue-600" />
                                         </div>
                                       )}
-                                      {notification.type === 'wishlist' && (
+                                      {notification.type === "wishlist" && (
                                         <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
                                           <Heart className="w-4 h-4 text-purple-600" />
                                         </div>
                                       )}
-                                      {notification.type === 'success' && (
+                                      {notification.type === "success" && (
                                         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                                           <CheckCircle2 className="w-4 h-4 text-green-600" />
                                         </div>
                                       )}
-                                      {notification.type === 'forum' && (
+                                      {notification.type === "forum" && (
                                         <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
                                           <MessageSquare className="w-4 h-4 text-orange-600" />
                                         </div>
@@ -453,8 +497,8 @@ export default function DashboardLayout({ children }) {
               <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-zinc-200" />
 
               <div className="relative">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="-m-1 sm:-m-1.5 flex items-center p-1 sm:p-1.5"
                   onClick={() => setProfileOpen(!profileOpen)}
                 >
@@ -463,7 +507,9 @@ export default function DashboardLayout({ children }) {
                     {getUserInitials()}
                   </div>
                   <span className="hidden lg:flex lg:items-center">
-                    <span className="ml-3 text-sm font-semibold leading-6 text-foreground">{user?.name || "User"}</span>
+                    <span className="ml-3 text-sm font-semibold leading-6 text-foreground">
+                      {user?.name || "User"}
+                    </span>
                   </span>
                 </Button>
 
@@ -472,11 +518,11 @@ export default function DashboardLayout({ children }) {
                   {profileOpen && (
                     <>
                       {/* Backdrop */}
-                      <div 
-                        className="fixed inset-0 z-40" 
+                      <div
+                        className="fixed inset-0 z-40"
                         onClick={() => setProfileOpen(false)}
                       />
-                      
+
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -487,8 +533,12 @@ export default function DashboardLayout({ children }) {
                         <div className="rounded-lg bg-background shadow-lg ring-1 ring-zinc-200 overflow-hidden">
                           {/* User Info */}
                           <div className="px-4 py-3 border-b border-zinc-200">
-                            <p className="text-sm font-semibold text-foreground">{user?.name || "User"}</p>
-                            <p className="text-xs text-foreground/60 mt-0.5">{user?.email || ""}</p>
+                            <p className="text-sm font-semibold text-foreground">
+                              {user?.name || "User"}
+                            </p>
+                            <p className="text-xs text-foreground/60 mt-0.5">
+                              {user?.email || ""}
+                            </p>
                           </div>
 
                           {/* Menu Items */}
@@ -524,9 +574,7 @@ export default function DashboardLayout({ children }) {
         </div>
 
         {/* Main content */}
-        <main className="py-4 sm:py-6">
-          {children}
-        </main>
+        <main className="py-4 sm:py-6">{children}</main>
       </div>
     </div>
   );

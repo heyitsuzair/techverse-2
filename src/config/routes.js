@@ -28,6 +28,7 @@ export default {
     },
     stalls: {
       add: "/dashboard/stalls/add",
+      myStalls: "/dashboard/stalls/my-stalls",
     },
     forums: "/dashboard/forums",
     messages: "/dashboard/messages",
