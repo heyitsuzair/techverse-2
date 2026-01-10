@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Textarea, Button, Spinner } from "@/components/ui";
+import { Input, Textarea, Button, Spinner, AddressAutocomplete } from "@/components/ui";
 import uploadToCloudinary from "@/utils/uploadToCloudinary";
 import deleteFromCloudinary from "@/utils/deleteFromCloudinary";
 
@@ -259,12 +259,10 @@ export default function AddStallModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">
-            {editStall ? "Edit Exchange Stall" : "Add Exchange Stall"}
-          </h2>
+          <h2 className="text-2xl font-bold">{editStall ? "Edit Exchange Stall" : "Add Exchange Stall"}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -332,31 +330,36 @@ export default function AddStallModal({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Location Address <span className="text-red-500">*</span>
             </label>
-            <div className="flex gap-2">
-              <Input
-                name="locationAddress"
+            <div className="space-y-2">
+              <AddressAutocomplete
                 value={formData.locationAddress}
-                onChange={handleChange}
-                placeholder="Enter full address"
-                required
-                className="flex-1"
+                onChange={(address, lat, lng) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    locationAddress: address,
+                    locationLat: lat,
+                    locationLng: lng,
+                  }));
+                }}
+                placeholder="Start typing your address..."
               />
               <Button
                 type="button"
                 onClick={handleUseCurrentLocation}
                 disabled={loading}
                 variant="outline"
+                className="w-full"
               >
-                📍 Use Current
+                📍 Use My Current Location
               </Button>
             </div>
           </div>
 
-          {/* Coordinates */}
+          {/* Coordinates (Read-only display) */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Latitude <span className="text-red-500">*</span>
+                Latitude
               </label>
               <Input
                 name="locationLat"
@@ -364,13 +367,14 @@ export default function AddStallModal({
                 step="any"
                 value={formData.locationLat || ""}
                 onChange={handleChange}
-                placeholder="e.g., 40.7128"
-                required
+                placeholder="Auto-filled"
+                readOnly
+                className="bg-gray-50"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Longitude <span className="text-red-500">*</span>
+                Longitude
               </label>
               <Input
                 name="locationLng"
@@ -378,8 +382,9 @@ export default function AddStallModal({
                 step="any"
                 value={formData.locationLng || ""}
                 onChange={handleChange}
-                placeholder="e.g., -74.0060"
-                required
+                placeholder="Auto-filled"
+                readOnly
+                className="bg-gray-50"
               />
             </div>
           </div>
