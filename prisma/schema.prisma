@@ -17,6 +17,12 @@ model User {
   phone        String?
   profileImage String?
   points       Int     @default(100)
+  bio          String?
+
+  // Location
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
 
   // OAuth
   googleId      String? @unique
@@ -26,6 +32,10 @@ model User {
   resetPasswordToken   String?
   resetPasswordExpires DateTime?
 
+  // Relations
+  books     Book[]
+  exchanges Exchange[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -33,3 +43,59 @@ model User {
   @@index([googleId])
 }
 
+model Book {
+  id          String  @id @default(uuid())
+  title       String
+  author      String?
+  isbn        String?
+  description String?
+  coverImage  String?
+  genre       String?
+  condition   String? // e.g., "New", "Like New", "Good", "Fair"
+  language    String? @default("English")
+
+  // Availability
+  isAvailable Boolean @default(true)
+
+  // Owner
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  exchanges Exchange[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isbn])
+  @@index([isAvailable])
+}
+
+model Exchange {
+  id     String @id @default(uuid())
+  status String @default("pending") // "pending", "accepted", "completed", "cancelled"
+
+  // Book being exchanged
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  // Users involved
+  requesterId String
+  requester   User   @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+
+  // Exchange details
+  message        String?
+  meetingAddress String?
+  meetingLat     Float?
+  meetingLng     Float?
+  scheduledAt    DateTime?
+  completedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([requesterId])
+  @@index([status])
+}

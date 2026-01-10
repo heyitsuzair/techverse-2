@@ -34,6 +34,10 @@ export const swaggerConfig = {
       name: "Authentication",
       description: "User authentication endpoints",
     },
+    {
+      name: "Users",
+      description: "User profile management endpoints",
+    },
   ],
   components: {
     securitySchemes: {
@@ -74,6 +78,112 @@ export const swaggerConfig = {
             type: "string",
             nullable: true,
             example: "https://example.com/avatar.jpg",
+          },
+          bio: {
+            type: "string",
+            nullable: true,
+            example: "Book lover and avid reader",
+          },
+          locationAddress: {
+            type: "string",
+            nullable: true,
+            example: "123 Main St, New York, NY 10001",
+          },
+          locationLat: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: 40.7128,
+          },
+          locationLng: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: -74.006,
+          },
+          booksListed: {
+            type: "integer",
+            example: 5,
+            description: "Total number of books listed by the user",
+          },
+          totalExchanges: {
+            type: "integer",
+            example: 3,
+            description: "Total number of completed exchanges",
+          },
+          currentPoints: {
+            type: "integer",
+            example: 100,
+            description: "Current points balance",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T12:00:00.000Z",
+          },
+        },
+      },
+      PublicUser: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "clx123abc456",
+          },
+          name: {
+            type: "string",
+            example: "John Doe",
+          },
+          profileImage: {
+            type: "string",
+            nullable: true,
+            example: "https://example.com/avatar.jpg",
+          },
+          bio: {
+            type: "string",
+            nullable: true,
+            example: "Book lover and avid reader",
+          },
+          locationAddress: {
+            type: "string",
+            nullable: true,
+            example: "123 Main St, New York, NY 10001",
+          },
+          locationLat: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: 40.7128,
+          },
+          locationLng: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: -74.006,
+          },
+          booksListed: {
+            type: "integer",
+            example: 5,
+            description: "Total number of books listed by the user",
+          },
+          totalExchanges: {
+            type: "integer",
+            example: 3,
+            description: "Total number of completed exchanges",
+          },
+          currentPoints: {
+            type: "integer",
+            example: 100,
+            description: "Current points balance",
+          },
+          points: {
+            type: "integer",
+            example: 100,
           },
           createdAt: {
             type: "string",
@@ -703,6 +813,259 @@ export const swaggerConfig = {
                       error: "Invalid or expired token",
                     },
                   },
+                },
+              },
+            },
+          },
+          404: {
+            description: "User not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "User not found",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/users/me": {
+      put: {
+        tags: ["Users"],
+        summary: "Update current user profile",
+        description:
+          "Update authenticated user profile information including name, email, phone, bio, location (address, lat, lng), and profile image",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    description: "User's full name",
+                    example: "John Doe",
+                  },
+                  email: {
+                    type: "string",
+                    format: "email",
+                    description: "User's email address",
+                    example: "john.doe@example.com",
+                  },
+                  phone: {
+                    type: "string",
+                    description: "User's phone number (optional)",
+                    example: "+1234567890",
+                  },
+                  bio: {
+                    type: "string",
+                    description: "User's bio/description (optional)",
+                    example: "Book lover and avid reader",
+                  },
+                  locationAddress: {
+                    type: "string",
+                    description: "User's location address (optional)",
+                    example: "123 Main St, New York, NY 10001",
+                  },
+                  locationLat: {
+                    type: "number",
+                    format: "float",
+                    description: "Location latitude (optional)",
+                    example: 40.7128,
+                  },
+                  locationLng: {
+                    type: "number",
+                    format: "float",
+                    description: "Location longitude (optional)",
+                    example: -74.006,
+                  },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description:
+                      "Profile image file (jpg, jpeg, png, gif, webp)",
+                  },
+                },
+              },
+              examples: {
+                updateBasicInfo: {
+                  summary: "Update basic information",
+                  value: {
+                    name: "Jane Smith",
+                    bio: "Passionate about classic literature",
+                    locationAddress: "San Francisco, CA",
+                  },
+                },
+                updateWithLocation: {
+                  summary: "Update with full location",
+                  value: {
+                    name: "Jane Smith",
+                    locationAddress: "456 Market St, San Francisco, CA 94103",
+                    locationLat: 37.7749,
+                    locationLng: -122.4194,
+                  },
+                },
+                updateWithImage: {
+                  summary: "Update with profile image",
+                  value: {
+                    name: "Jane Smith",
+                    profileImage: "(binary file data)",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Profile updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Profile updated successfully",
+                    },
+                    user: {
+                      $ref: "#/components/schemas/User",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Email already in use",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "Email already in use",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized - No token or invalid token",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "User not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description:
+              "Internal server error - Failed to upload image or update profile",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                examples: {
+                  uploadError: {
+                    value: {
+                      error: "Failed to upload profile image",
+                    },
+                  },
+                  serverError: {
+                    value: {
+                      error: "Internal server error",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/users/{id}": {
+      get: {
+        tags: ["Users"],
+        summary: "Get other user's public profile",
+        description:
+          "Get public profile information of any user by their ID (no authentication required)",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "User ID",
+            schema: {
+              type: "string",
+              example: "clx123abc456",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "User profile retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    user: {
+                      $ref: "#/components/schemas/PublicUser",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - User ID is required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "User ID is required",
                 },
               },
             },

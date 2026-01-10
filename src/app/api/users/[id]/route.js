@@ -1,50 +1,41 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyAccessToken } from "@/lib/auth/jwt";
-import { validateAuthHeader } from "@/lib/auth/token-utils";
 
-export async function GET(request) {
+/**
+ * GET /api/users/:id
+ * Get public user profile by ID
+ */
+export async function GET(request, { params }) {
   try {
-    // Validate and extract token
-    const { token, error: tokenError } = validateAuthHeader(request);
+    const { id } = params;
 
-    if (tokenError) {
-      return NextResponse.json({ error: tokenError }, { status: 401 });
-    }
-
-    // Verify token
-    let decoded;
-    try {
-      decoded = verifyAccessToken(token);
-    } catch (error) {
+    if (!id) {
       return NextResponse.json(
-        { error: "Invalid or expired token" },
-        { status: 401 }
+        { error: "User ID is required" },
+        { status: 400 }
       );
     }
 
-    // Get user
+    // Get user with public information only
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id },
       select: {
         id: true,
-        email: true,
         name: true,
-        phone: true,
-        points: true,
         profileImage: true,
         bio: true,
         locationAddress: true,
         locationLat: true,
         locationLng: true,
+        points: true,
         createdAt: true,
-        updatedAt: true,
         _count: {
           select: {
             books: true,
             exchanges: true,
           },
         },
+        // Exclude sensitive information like email, phone, password, tokens, etc.
       },
     });
 
@@ -52,10 +43,10 @@ export async function GET(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Calculate completed exchanges
+    // Get completed exchanges count for this user
     const completedExchanges = await prisma.exchange.count({
       where: {
-        requesterId: decoded.id,
+        requesterId: id,
         status: "completed",
       },
     });
@@ -70,7 +61,7 @@ export async function GET(request) {
       },
     });
   } catch (error) {
-    console.error("Get user error:", error);
+    console.error("Get user by ID error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
