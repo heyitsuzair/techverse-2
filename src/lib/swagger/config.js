@@ -38,6 +38,10 @@ export const swaggerConfig = {
       name: "Users",
       description: "User profile management endpoints",
     },
+    {
+      name: "Books",
+      description: "Book listing and marketplace endpoints",
+    },
   ],
   components: {
     securitySchemes: {
@@ -189,6 +193,161 @@ export const swaggerConfig = {
             type: "string",
             format: "date-time",
             example: "2026-01-10T10:00:00.000Z",
+          },
+        },
+      },
+      Book: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "book-uuid",
+          },
+          title: {
+            type: "string",
+            example: "The Great Gatsby",
+          },
+          author: {
+            type: "string",
+            nullable: true,
+            example: "F. Scott Fitzgerald",
+          },
+          isbn: {
+            type: "string",
+            nullable: true,
+            example: "978-0-7432-7356-5",
+          },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "A classic American novel...",
+          },
+          coverImage: {
+            type: "string",
+            nullable: true,
+            example: "https://res.cloudinary.com/...",
+          },
+          qrCodeUrl: {
+            type: "string",
+            nullable: true,
+            example: "https://res.cloudinary.com/.../qr_book-uuid.png",
+          },
+          genre: {
+            type: "string",
+            nullable: true,
+            example: "Fiction",
+          },
+          condition: {
+            type: "string",
+            nullable: true,
+            example: "good",
+            enum: ["new", "excellent", "good", "fair", "poor"],
+          },
+          language: {
+            type: "string",
+            example: "English",
+          },
+          pointValue: {
+            type: "integer",
+            example: 10,
+          },
+          locationAddress: {
+            type: "string",
+            nullable: true,
+            example: "New York, NY",
+          },
+          locationLat: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: 40.7128,
+          },
+          locationLng: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: -74.006,
+          },
+          isAvailable: {
+            type: "boolean",
+            example: true,
+          },
+          userId: {
+            type: "string",
+            example: "user-uuid",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T12:00:00.000Z",
+          },
+        },
+      },
+      BookHistory: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "history-uuid",
+          },
+          bookId: {
+            type: "string",
+            example: "book-uuid",
+          },
+          userId: {
+            type: "string",
+            example: "user-uuid",
+          },
+          action: {
+            type: "string",
+            example: "scanned",
+            enum: ["scanned", "noted", "exchanged", "read", "reviewed"],
+          },
+          notes: {
+            type: "string",
+            nullable: true,
+            example: "Found at Central Library",
+          },
+          locationAddress: {
+            type: "string",
+            nullable: true,
+            example: "Central Library, 476 5th Ave, New York, NY 10018",
+          },
+          locationLat: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: 40.7128,
+          },
+          locationLng: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: -74.006,
+          },
+          startDate: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+            example: "2026-01-01T00:00:00.000Z",
+            description: "Start date for reading action",
+          },
+          endDate: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+            example: "2026-01-10T00:00:00.000Z",
+            description: "End date for reading action",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T11:00:00.000Z",
           },
         },
       },
@@ -1079,6 +1238,858 @@ export const swaggerConfig = {
                 },
                 example: {
                   error: "User not found",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/books": {
+      get: {
+        tags: ["Books"],
+        summary: "Get all books (Marketplace)",
+        description:
+          "Browse all available books with filtering, search, and pagination",
+        parameters: [
+          {
+            name: "genre",
+            in: "query",
+            description: "Filter by genre",
+            schema: {
+              type: "string",
+              example: "Fiction",
+            },
+          },
+          {
+            name: "condition",
+            in: "query",
+            description: "Filter by condition",
+            schema: {
+              type: "string",
+              enum: ["new", "excellent", "good", "fair", "poor"],
+              example: "good",
+            },
+          },
+          {
+            name: "location",
+            in: "query",
+            description: "Search in location address",
+            schema: {
+              type: "string",
+              example: "New York",
+            },
+          },
+          {
+            name: "search",
+            in: "query",
+            description: "Search in title, author, description",
+            schema: {
+              type: "string",
+              example: "gatsby",
+            },
+          },
+          {
+            name: "userId",
+            in: "query",
+            description: "Filter by book owner",
+            schema: {
+              type: "string",
+              example: "user-uuid",
+            },
+          },
+          {
+            name: "page",
+            in: "query",
+            description: "Page number",
+            schema: {
+              type: "integer",
+              default: 1,
+              example: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Items per page",
+            schema: {
+              type: "integer",
+              default: 20,
+              example: 20,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Books retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    books: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Book",
+                      },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: {
+                          type: "integer",
+                          example: 1,
+                        },
+                        limit: {
+                          type: "integer",
+                          example: 20,
+                        },
+                        total: {
+                          type: "integer",
+                          example: 50,
+                        },
+                        totalPages: {
+                          type: "integer",
+                          example: 3,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Books"],
+        summary: "Create a new book listing",
+        description:
+          "List a new book on the marketplace with automatic QR code generation",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["title", "genre", "condition"],
+                properties: {
+                  title: {
+                    type: "string",
+                    description: "Book title",
+                    example: "The Great Gatsby",
+                  },
+                  author: {
+                    type: "string",
+                    description: "Author name",
+                    example: "F. Scott Fitzgerald",
+                  },
+                  isbn: {
+                    type: "string",
+                    description: "ISBN number",
+                    example: "978-0-7432-7356-5",
+                  },
+                  description: {
+                    type: "string",
+                    description: "Book description",
+                    example: "A classic American novel",
+                  },
+                  genre: {
+                    type: "string",
+                    description: "Book genre",
+                    example: "Fiction",
+                  },
+                  condition: {
+                    type: "string",
+                    description: "Book condition",
+                    enum: ["new", "excellent", "good", "fair", "poor"],
+                    example: "good",
+                  },
+                  language: {
+                    type: "string",
+                    description: "Book language",
+                    example: "English",
+                  },
+                  pointValue: {
+                    type: "integer",
+                    description: "Points required for exchange",
+                    example: 10,
+                  },
+                  locationAddress: {
+                    type: "string",
+                    description: "Book location address",
+                    example: "New York, NY",
+                  },
+                  locationLat: {
+                    type: "number",
+                    format: "float",
+                    description: "Latitude",
+                    example: 40.7128,
+                  },
+                  locationLng: {
+                    type: "number",
+                    format: "float",
+                    description: "Longitude",
+                    example: -74.006,
+                  },
+                  coverImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "Cover image file",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Book created successfully with QR code",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Book listed successfully",
+                    },
+                    book: {
+                      $ref: "#/components/schemas/Book",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Missing required fields",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "Title, genre, and condition are required",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/books/{id}": {
+      get: {
+        tags: ["Books"],
+        summary: "Get book details",
+        description: "Get detailed information about a specific book",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Book retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    book: {
+                      $ref: "#/components/schemas/Book",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Book ID required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "Book not found",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      put: {
+        tags: ["Books"],
+        summary: "Update book details",
+        description: "Update book information (owner only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  title: {
+                    type: "string",
+                    example: "Updated Title",
+                  },
+                  author: {
+                    type: "string",
+                    example: "Author Name",
+                  },
+                  description: {
+                    type: "string",
+                    example: "Updated description",
+                  },
+                  condition: {
+                    type: "string",
+                    enum: ["new", "excellent", "good", "fair", "poor"],
+                    example: "good",
+                  },
+                  isAvailable: {
+                    type: "boolean",
+                    example: true,
+                  },
+                  coverImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "New cover image",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Book updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Book updated successfully",
+                    },
+                    book: {
+                      $ref: "#/components/schemas/Book",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not book owner",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "You don't have permission to update this book",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Books"],
+        summary: "Delete a book",
+        description: "Delete a book listing (owner only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Book deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Book deleted successfully",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not book owner",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "You don't have permission to delete this book",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/books/{id}/history": {
+      get: {
+        tags: ["Books"],
+        summary: "Get book history",
+        description: "Get all history entries for a book",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "History retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    history: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/BookHistory",
+                      },
+                    },
+                    total: {
+                      type: "integer",
+                      example: 5,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Book ID required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Books"],
+        summary: "Add book history entry",
+        description: "Add a history entry (QR scan, note, etc.)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["action"],
+                properties: {
+                  action: {
+                    type: "string",
+                    enum: ["scanned", "noted", "exchanged", "read", "reviewed"],
+                    example: "scanned",
+                    description: "Type of action performed with the book",
+                  },
+                  notes: {
+                    type: "string",
+                    example: "Found this book at Central Library",
+                    description: "Optional notes about the action",
+                  },
+                  locationAddress: {
+                    type: "string",
+                    example: "Central Library, 476 5th Ave, New York, NY 10018",
+                    description: "Full address where action occurred",
+                  },
+                  locationLat: {
+                    type: "number",
+                    format: "float",
+                    example: 40.7128,
+                    description: "Latitude coordinate",
+                  },
+                  locationLng: {
+                    type: "number",
+                    format: "float",
+                    example: -74.006,
+                    description: "Longitude coordinate",
+                  },
+                  startDate: {
+                    type: "string",
+                    format: "date-time",
+                    example: "2026-01-01T00:00:00.000Z",
+                    description:
+                      "Start date when you began reading the book (optional, typically used with action='read'). Format: ISO 8601 date-time string",
+                  },
+                  endDate: {
+                    type: "string",
+                    format: "date-time",
+                    example: "2026-01-10T00:00:00.000Z",
+                    description:
+                      "End date when you finished reading the book (optional, typically used with action='read'). Format: ISO 8601 date-time string",
+                  },
+                },
+              },
+              examples: {
+                scan: {
+                  summary: "QR code scan (with location)",
+                  value: {
+                    action: "scanned",
+                    notes: "Found at local coffee shop",
+                    locationAddress: "Starbucks, 123 Main St, NYC",
+                    locationLat: 40.7128,
+                    locationLng: -74.006,
+                  },
+                },
+                reading: {
+                  summary: "Reading record (with dates)",
+                  value: {
+                    action: "read",
+                    notes: "Great story, highly recommend!",
+                    locationAddress: "Home",
+                    locationLat: 40.7128,
+                    locationLng: -74.006,
+                    startDate: "2026-01-01T00:00:00.000Z",
+                    endDate: "2026-01-10T00:00:00.000Z",
+                  },
+                },
+                readingInProgress: {
+                  summary: "Started reading (only startDate)",
+                  value: {
+                    action: "read",
+                    notes: "Just started this book today!",
+                    startDate: "2026-01-10T00:00:00.000Z",
+                  },
+                },
+                review: {
+                  summary: "Book review (no dates needed)",
+                  value: {
+                    action: "reviewed",
+                    notes: "Five stars! Amazing plot and characters.",
+                  },
+                },
+                exchange: {
+                  summary: "Book exchange (with location)",
+                  value: {
+                    action: "exchanged",
+                    notes: "Exchanged with John at library",
+                    locationAddress: "Public Library, Downtown",
+                    locationLat: 40.7589,
+                    locationLng: -73.9851,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "History entry added successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "History entry added successfully",
+                    },
+                    history: {
+                      $ref: "#/components/schemas/BookHistory",
+                    },
+                  },
+                },
+                example: {
+                  success: true,
+                  message: "History entry added successfully",
+                  history: {
+                    id: "history-uuid-123",
+                    bookId: "book-uuid-456",
+                    userId: "user-uuid-789",
+                    action: "read",
+                    notes: "Finished reading, excellent book!",
+                    locationAddress: "Home Library, 123 Main St, NYC",
+                    locationLat: 40.7128,
+                    locationLng: -74.006,
+                    startDate: "2026-01-01T00:00:00.000Z",
+                    endDate: "2026-01-10T00:00:00.000Z",
+                    createdAt: "2026-01-10T15:30:00.000Z",
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Action required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                example: {
+                  error: "Action is required",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
                 },
               },
             },

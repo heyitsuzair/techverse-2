@@ -50,9 +50,16 @@ model Book {
   isbn        String?
   description String?
   coverImage  String?
+  qrCodeUrl   String? // QR code image URL from Cloudinary
   genre       String?
-  condition   String? // e.g., "New", "Like New", "Good", "Fair"
+  condition   String? // e.g., "new", "excellent", "good", "fair", "poor"
   language    String? @default("English")
+  pointValue  Int     @default(10) // Points required for exchange
+
+  // Location
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
 
   // Availability
   isAvailable Boolean @default(true)
@@ -62,7 +69,8 @@ model Book {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Relations
-  exchanges Exchange[]
+  exchanges   Exchange[]
+  bookHistory BookHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,6 +78,31 @@ model Book {
   @@index([userId])
   @@index([isbn])
   @@index([isAvailable])
+  @@index([genre])
+}
+
+model BookHistory {
+  id     String  @id @default(uuid())
+  bookId String
+  book   Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId String
+  action String // "scanned", "noted", "exchanged", "read", "reviewed"
+  notes  String?
+
+  // Location
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
+
+  // Reading dates (for "read" action)
+  startDate DateTime?
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([bookId])
+  @@index([userId])
+  @@index([action])
 }
 
 model Exchange {
