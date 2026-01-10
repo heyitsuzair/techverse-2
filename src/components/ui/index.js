@@ -18,6 +18,7 @@ export { LinkWithProgress } from "./LinkWithProgress";
 export { Spinner } from "./Spinner";
 export { PhoneInput } from "./PhoneInput";
 export { PasswordInput } from "./PasswordInput";
+export { AddressAutocomplete } from "./AddressAutocomplete";
 export { Radio, RadioGroup } from "./Radio";
 export { Checkbox, CheckboxGroup } from "./Checkbox";
 export {

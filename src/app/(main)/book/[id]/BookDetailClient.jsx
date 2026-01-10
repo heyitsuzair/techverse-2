@@ -99,7 +99,7 @@ export default function BookDetailClient({ params }) {
     <>
       <Navigation />
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {/* Alert Banner */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}

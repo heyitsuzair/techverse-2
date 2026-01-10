@@ -20,6 +20,7 @@
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@react-google-maps/api": "^2.20.8",
+    "@react-oauth/google": "^0.13.4",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
     "cloudinary": "^2.5.1",
@@ -40,6 +41,7 @@
     "stripe": "^20.1.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-react": "^5.31.0",
+    "use-places-autocomplete": "^4.0.1",
     "world-countries": "^5.1.0",
     "yup": "^1.7.1"
   },

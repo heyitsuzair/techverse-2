@@ -29,10 +29,10 @@ export default function Navigation() {
             onClick={() => router.push(routes.home)}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <div className="w-9 h-9 md:w-10 md:h-10 bg-linear-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-md">
+            <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-md">
               <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
             </div>
-            <h1 className="text-lg md:text-xl font-bold bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               BooksExchange
             </h1>
           </motion.button>
@@ -62,7 +62,7 @@ export default function Navigation() {
             </Button>
             <Button
               onClick={() => router.push(routes.auth.signup)}
-              className="text-sm md:text-base bg-linear-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="text-sm md:text-base bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
             >
               Sign Up
             </Button>
@@ -122,7 +122,7 @@ export default function Navigation() {
                       router.push(routes.auth.signup);
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-3 bg-linear-to-r from-primary to-secondary text-primary-foreground rounded-lg hover:shadow-lg transition-all cursor-pointer"
+                    className="w-full text-left px-4 py-3 bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-lg hover:shadow-lg transition-all cursor-pointer"
                   >
                     Sign Up
                   </button>

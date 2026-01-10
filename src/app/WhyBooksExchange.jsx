@@ -86,10 +86,10 @@ export default function WhyBooksExchange() {
             const Icon = item.icon;
             return (
               <motion.div key={index} variants={itemVariants}>
-                <Card className="hover:shadow-xl transition-all duration-300 border-border h-full group bg-card cursor-pointer p-2">
-                  <CardContent className="p-5 sm:p-6 md:p-8">
+                <Card className="hover:shadow-xl transition-all duration-300 border-border h-full group bg-card cursor-pointer">
+                  <CardContent className="p-5 sm:p-6 md:p-8 pt-6 sm:pt-7 md:pt-9">
                     <div
-                      className={`w-12 h-12 sm:w-14 sm:h-14 ${item.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-12 h-12 sm:w-14 sm:h-14 ${item.color} rounded-xl flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300`}
                     >
                       <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>

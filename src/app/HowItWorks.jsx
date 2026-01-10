@@ -95,12 +95,12 @@ export default function HowItWorks() {
                   {/* Decorative gradient on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 transition-all duration-300 z-0"></div>
 
-                  <CardContent className="relative p-5 sm:p-6 md:p-8">
+                  <CardContent className="relative p-5 sm:p-6 md:p-8 pt-6 sm:pt-8">
                     {/* Icon */}
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 300 }}
-                      className={`w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg`}
+                      className={`w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-5 md:mb-6 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg`}
                     >
                       <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                     </motion.div>
@@ -111,7 +111,7 @@ export default function HowItWorks() {
                     </div>
 
                     {/* Title */}
-                    <h4 className="text-lg sm:text-xl font-bold text-card-foreground mb-2">
+                    <h4 className="text-lg sm:text-xl font-bold text-card-foreground mb-2 sm:mb-3">
                       {item.title}
                     </h4>
 
