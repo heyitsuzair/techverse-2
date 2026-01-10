@@ -54,7 +54,7 @@ export async function forgotPassword(email) {
  * @returns {Promise<Object>} Response confirming password reset
  */
 export async function resetPassword(token, newPassword) {
-  return post(endpoints.auth.resetPassword, { token, newPassword });
+  return post(endpoints.auth.resetPassword, { token, password: newPassword });
 }
 
 /**
@@ -75,4 +75,44 @@ export async function getCurrentUser(accessToken) {
  */
 export async function refreshAccessToken(refreshToken) {
   return post(endpoints.auth.refresh, { refreshToken });
+}
+
+/**
+ * Update user profile
+ * @param {Object} profileData - Profile data to update
+ * @param {string} [profileData.name] - User's name
+ * @param {string} [profileData.email] - User's email
+ * @param {string} [profileData.phone] - User's phone
+ * @param {string} [profileData.bio] - User's bio
+ * @param {string} [profileData.location] - User's location
+ * @param {File} [profileData.profileImage] - Profile image file
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} Updated user data
+ */
+export async function updateProfile(profileData, accessToken) {
+  // Create FormData for multipart/form-data upload
+  const formData = new FormData();
+  
+  Object.keys(profileData).forEach(key => {
+    const value = profileData[key];
+    // Only skip undefined and null, allow empty strings to be sent
+    if (value !== undefined && value !== null) {
+      formData.append(key, value);
+    }
+  });
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${endpoints.users.me}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update profile');
+  }
+
+  return response.json();
 }

@@ -63,6 +63,16 @@ export default function DashboardLayout({ children }) {
   const { logout, user } = useAuth();
   const router = useRouterWithProgress();
 
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user?.name) return "U";
+    const names = user.name.split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return user.name.substring(0, 2).toUpperCase();
+  };
+
   const handleLogout = () => {
     logout();
     setProfileOpen(false);
@@ -184,10 +194,10 @@ export default function DashboardLayout({ children }) {
                   className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-foreground hover:bg-primary/5 border-t border-zinc-200"
                 >
                   <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-sm font-bold">
-                    JD
+                    {getUserInitials()}
                   </div>
                   <span className="sr-only">Your profile</span>
-                  <span aria-hidden="true">John Doe</span>
+                  <span aria-hidden="true">{user?.name || "User"}</span>
                 </LinkWithProgress>
               </li>
             </ul>
@@ -450,10 +460,10 @@ export default function DashboardLayout({ children }) {
                 >
                   <span className="sr-only">Open user menu</span>
                   <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-xs sm:text-sm font-bold">
-                    JD
+                    {getUserInitials()}
                   </div>
                   <span className="hidden lg:flex lg:items-center">
-                    <span className="ml-3 text-sm font-semibold leading-6 text-foreground">John Doe</span>
+                    <span className="ml-3 text-sm font-semibold leading-6 text-foreground">{user?.name || "User"}</span>
                   </span>
                 </Button>
 
@@ -477,8 +487,8 @@ export default function DashboardLayout({ children }) {
                         <div className="rounded-lg bg-background shadow-lg ring-1 ring-zinc-200 overflow-hidden">
                           {/* User Info */}
                           <div className="px-4 py-3 border-b border-zinc-200">
-                            <p className="text-sm font-semibold text-foreground">John Doe</p>
-                            <p className="text-xs text-foreground/60 mt-0.5">john.doe@example.com</p>
+                            <p className="text-sm font-semibold text-foreground">{user?.name || "User"}</p>
+                            <p className="text-xs text-foreground/60 mt-0.5">{user?.email || ""}</p>
                           </div>
 
                           {/* Menu Items */}

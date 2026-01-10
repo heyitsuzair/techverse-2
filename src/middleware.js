@@ -5,6 +5,7 @@ export function middleware(request) {
   
   // Get access token from cookies
   const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
   
   // Define protected routes (dashboard routes)
   const isProtectedRoute = pathname.startsWith("/dashboard");
@@ -16,8 +17,9 @@ export function middleware(request) {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password");
   
-  // Redirect to signin if accessing protected route without token
-  if (isProtectedRoute && !accessToken) {
+  // Redirect to signin only if accessing protected route without ANY token
+  // This allows AuthContext to handle token refresh on the client side
+  if (isProtectedRoute && !accessToken && !refreshToken) {
     const signinUrl = new URL("/signin", request.url);
     signinUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(signinUrl);

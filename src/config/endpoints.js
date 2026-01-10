@@ -16,8 +16,8 @@ export default {
     delete: (id) => `/api/books/${id}`,
   },
   users: {
-    profile: '/api/users/profile',
-    update: '/api/users/update',
+    me: '/api/users/me',
+    profile: (id) => `/api/users/${id}`,
   },
   exchange: {
     request: '/api/exchange/request',
@@ -31,5 +31,9 @@ export default {
   qr: {
     scan: (bookId) => `/api/qr/scan/${bookId}`,
     history: '/api/qr/history',
+  },
+  payments: {
+    packages: '/api/payments/packages',
+    createSession: '/api/payments/create-session',
   },
 };

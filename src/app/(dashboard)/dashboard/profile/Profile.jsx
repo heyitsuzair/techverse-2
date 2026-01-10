@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { updateProfile } from "@/lib/api/auth";
+import { getFromCookie } from "@/utils/cookies";
+import { toast } from "sonner";
 import { 
   Card, 
   CardHeader, 
@@ -12,7 +16,9 @@ import {
   Badge,
   Textarea,
   Select,
-  Checkbox
+  Checkbox,
+  AddressAutocomplete,
+  Spinner
 } from "@/components/ui";
 import { 
   User, 
@@ -64,13 +70,144 @@ const MOCK_POINTS_HISTORY = [
 ];
 
 export default function Profile() {
+  const { user, refreshUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-  const [formData, setFormData] = useState(MOCK_USER_PROFILE);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    locationAddress: "",
+    locationLat: null,
+    locationLng: null,
+    bio: "",
+    memberSince: "",
+    avatar: ""
+  });
 
-  const handleSave = () => {
-    // Save logic here
-    setIsEditing(false);
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user?.name) return "U";
+    const names = user.name.split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return user.name.substring(0, 2).toUpperCase();
+  };
+
+  // Format member since date
+  const formatMemberSince = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        toast.error('Invalid file type', {
+          description: 'Please select a valid image (jpg, png, gif, or webp)',
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File too large', {
+          description: 'Please select an image smaller than 5MB',
+        });
+        return;
+      }
+
+      setProfileImageFile(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Trigger file input click
+  const handleChangeAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Update formData when user data is available
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        locationAddress: user.locationAddress || "",
+        locationLat: user.locationLat || null,
+        locationLng: user.locationLng || null,
+        bio: user.bio || "Avid reader and book collector. Love sharing my favorite books with fellow readers!",
+        memberSince: formatMemberSince(user.createdAt),
+        avatar: getUserInitials()
+      });
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const accessToken = getFromCookie('accessToken');
+      if (!accessToken) {
+        toast.error('Authentication required', {
+          description: 'Please sign in again',
+        });
+        return;
+      }
+
+      // Send all current form data to prevent data loss
+      const updateData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || '',
+        locationAddress: formData.locationAddress || '',
+        locationLat: formData.locationLat || '',
+        locationLng: formData.locationLng || '',
+        bio: formData.bio || '',
+      };
+
+      // Add profile image if selected
+      if (profileImageFile) {
+        updateData.profileImage = profileImageFile;
+      }
+
+      const response = await updateProfile(updateData, accessToken);
+      
+      // Refresh user data in context
+      await refreshUser();
+      
+      // Clear image file state
+      setProfileImageFile(null);
+      setProfileImagePreview(null);
+      
+      toast.success('Profile updated successfully!', {
+        description: 'Your changes have been saved',
+      });
+      
+      setIsEditing(false);
+    } catch (error) {
+      toast.error('Update failed', {
+        description: error.message || 'Failed to update profile',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleChange = (field, value) => {
@@ -104,12 +241,21 @@ export default function Profile() {
                       </Button>
                     ) : (
                       <div className="flex gap-2">
-                        <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
+                        <Button onClick={() => setIsEditing(false)} variant="outline" size="sm" disabled={isSaving}>
                           Cancel
                         </Button>
-                        <Button onClick={handleSave} variant="primary" size="sm">
-                          <Save className="w-4 h-4 mr-2" />
-                          Save Changes
+                        <Button onClick={handleSave} variant="primary" size="sm" disabled={isSaving}>
+                          {isSaving ? (
+                            <>
+                              <Spinner size="sm" className="mr-2" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4 mr-2" />
+                              Save Changes
+                            </>
+                          )}
                         </Button>
                       </div>
                     )}
@@ -118,13 +264,30 @@ export default function Profile() {
                 <CardContent>
                   <div className="space-y-6">
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-3xl font-bold">
-                        {formData.avatar}
-                      </div>
+                      {profileImagePreview || user?.profileImage ? (
+                        <img
+                          src={profileImagePreview || user.profileImage}
+                          alt="Profile"
+                          className="w-24 h-24 rounded-full object-cover border-2 border-primary"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-3xl font-bold">
+                          {formData.avatar}
+                        </div>
+                      )}
                       {isEditing && (
-                        <Button variant="outline" size="sm">
-                          Change Avatar
-                        </Button>
+                        <>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                            onChange={handleImageChange}
+                            className="hidden"
+                          />
+                          <Button variant="outline" size="sm" onClick={handleChangeAvatarClick} type="button">
+                            Change Avatar
+                          </Button>
+                        </>
                       )}
                     </div>
 
@@ -138,6 +301,7 @@ export default function Profile() {
                           <Input
                             value={formData.name}
                             onChange={(e) => handleChange("name", e.target.value)}
+                            placeholder="Enter your name"
                           />
                         ) : (
                           <Text variant="body">{formData.name}</Text>
@@ -181,12 +345,20 @@ export default function Profile() {
                           Location
                         </Text>
                         {isEditing ? (
-                          <Input
-                            value={formData.location}
-                            onChange={(e) => handleChange("location", e.target.value)}
+                          <AddressAutocomplete
+                            value={formData.locationAddress}
+                            onChange={(address, lat, lng) => {
+                              setFormData({ 
+                                ...formData, 
+                                locationAddress: address,
+                                locationLat: lat,
+                                locationLng: lng
+                              });
+                            }}
+                            placeholder="Enter your address"
                           />
                         ) : (
-                          <Text variant="body">{formData.location}</Text>
+                          <Text variant="body">{formData.locationAddress || "No location set"}</Text>
                         )}
                       </div>
                     </div>
@@ -222,19 +394,19 @@ export default function Profile() {
                         <Calendar className="w-4 h-4" />
                         Member Since
                       </Text>
-                      <Text variant="h4">{formData.memberSince}</Text>
+                      <Text variant="h4">{formData.memberSince || "Unknown"}</Text>
                     </div>
                     <div>
                       <Text variant="caption" className="text-zinc-500">Books Listed</Text>
-                      <Text variant="h4">{MOCK_MY_BOOKS.length}</Text>
+                      <Text variant="h4">{user?.booksListed || 0}</Text>
                     </div>
                     <div>
                       <Text variant="caption" className="text-zinc-500">Total Exchanges</Text>
-                      <Text variant="h4">{MOCK_EXCHANGE_HISTORY.filter(e => e.status === "Completed").length}</Text>
+                      <Text variant="h4">{user?.totalExchanges || 0}</Text>
                     </div>
                     <div>
                       <Text variant="caption" className="text-zinc-500">Current Points</Text>
-                      <Text variant="h4" className="text-amber-600">1,250</Text>
+                      <Text variant="h4" className="text-amber-600">{user?.points || 0}</Text>
                     </div>
                   </div>
                 </CardContent>
