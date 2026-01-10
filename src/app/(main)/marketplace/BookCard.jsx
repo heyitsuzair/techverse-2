@@ -24,62 +24,65 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
       transition={{ duration: 0.3 }}
     >
       <Card
-        className="overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-slate-200 group h-full"
+        className="overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-border group h-full bg-card"
         onClick={() => onCardClick(book.id)}
       >
         <div className="relative overflow-hidden">
           <img
             src={book.imageUrl}
             alt={book.title}
-            className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-48 sm:h-52 md:h-56 object-cover group-hover:scale-110 transition-transform duration-500"
           />
           {!book.available && (
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center">
-              <Badge variant="danger" className="shadow-lg">
+            <div className="absolute inset-0 bg-foreground/70 backdrop-blur-sm flex items-center justify-center">
+              <Badge
+                variant="danger"
+                className="shadow-lg bg-error text-error-foreground text-xs sm:text-sm"
+              >
                 Currently Unavailable
               </Badge>
             </div>
           )}
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
             <Badge
               variant="primary"
               size="sm"
-              className="shadow-lg font-semibold"
+              className="shadow-lg font-semibold bg-primary text-primary-foreground text-xs sm:text-sm"
             >
               {book.points} Points
             </Badge>
           </div>
         </div>
 
-        <CardContent className="p-5">
-          <div className="flex justify-between items-start mb-3">
+        <CardContent className="p-3 sm:p-4 md:p-5 pt-4 sm:pt-5 md:pt-6">
+          <div className="flex justify-between items-start mb-2 sm:mb-3">
             <Badge
               variant={getConditionVariant(book.condition)}
               size="sm"
-              className="font-medium"
+              className="font-medium text-xs sm:text-sm"
             >
               {book.condition}
             </Badge>
           </div>
 
-          <h4 className="font-bold text-slate-900 mb-1 line-clamp-1 text-lg group-hover:text-primary transition-colors">
+          <h4 className="font-bold text-card-foreground mb-1 line-clamp-1 text-base sm:text-lg group-hover:text-primary transition-colors">
             {book.title}
           </h4>
-          <p className="text-sm text-slate-600 mb-3">{book.author}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">{book.author}</p>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
-            <span className="font-medium bg-slate-100 px-2 py-1 rounded">
+          <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4">
+            <span className="font-medium bg-muted px-2 py-1 rounded text-[10px] sm:text-xs">
               {book.genre}
             </span>
             <div className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              <span>{book.location.split(",")[0]}</span>
+              <span className="text-[10px] sm:text-xs">{book.location.split(",")[0]}</span>
             </div>
           </div>
 
           <Button
             size="sm"
-            className="w-full shadow-md hover:shadow-lg transition-all"
+            className="w-full shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-xs sm:text-sm py-2"
             disabled={!book.available}
             onClick={(e) => {
               e.stopPropagation();
@@ -89,7 +92,7 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
             {book.available ? (
               <>
                 Request Book
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
               </>
             ) : (
               "Unavailable"

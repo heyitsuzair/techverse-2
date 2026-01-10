@@ -38,11 +38,11 @@ export default function SearchFilters({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mb-8"
+      className="bg-card rounded-2xl shadow-lg border border-border p-4 sm:p-6 mb-8"
     >
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <SlidersHorizontal className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-card-foreground">
           Search & Filters
         </h3>
       </div>
@@ -50,22 +50,22 @@ export default function SearchFilters({
       <div className="space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             placeholder="Search by title or author..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 text-base h-12 border-slate-300 focus:border-primary"
+            className="pl-12 text-base h-12 border-input focus:border-primary focus:ring-ring"
           />
         </div>
 
         {/* Filter Grid */}
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Select
             label="Genre"
             value={selectedGenre}
             onChange={(e) => setSelectedGenre(e.target.value)}
-            className="border-slate-300 focus:border-primary"
+            className="border-input focus:border-primary focus:ring-ring"
           >
             {GENRES.map((genre) => (
               <option key={genre} value={genre}>
@@ -78,7 +78,7 @@ export default function SearchFilters({
             label="Condition"
             value={selectedCondition}
             onChange={(e) => setSelectedCondition(e.target.value)}
-            className="border-slate-300 focus:border-primary"
+            className="border-input focus:border-primary focus:ring-ring"
           >
             {CONDITIONS.map((condition) => (
               <option key={condition} value={condition}>
@@ -91,7 +91,7 @@ export default function SearchFilters({
             label="Location"
             value={selectedLocation}
             onChange={(e) => setSelectedLocation(e.target.value)}
-            className="border-slate-300 focus:border-primary"
+            className="border-input focus:border-primary focus:ring-ring"
           >
             {LOCATIONS.map((location) => (
               <option key={location} value={location}>

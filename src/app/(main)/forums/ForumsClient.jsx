@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, MessageCircle, Plus } from "lucide-react";
+import { Plus, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import Navigation from "@/app/Navigation";
+import Footer from "@/app/Footer";
 import ForumSearch from "./ForumSearch";
 import CategorySidebar from "./CategorySidebar";
 import DiscussionCard from "./DiscussionCard";
@@ -121,143 +123,111 @@ export default function ForumsClient() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Navigation */}
-      <nav className="border-b border-slate-200/60 bg-white/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              onClick={() => router.push(routes.home)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <BookOpen className="w-8 h-8 text-primary" />
-              <h1 className="hidden sm:block text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                BooksExchange
-              </h1>
-            </motion.button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push(routes.auth.signin)}
-              >
-                Login
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => router.push(routes.auth.signup)}
-                className="shadow-md"
-              >
-                Sign Up
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-                Community Forums
-              </h1>
-              <p className="text-slate-600">
-                Join discussions, share insights, and connect with fellow
-                readers
-              </p>
-            </div>
-            <Button
-              size="lg"
-              className="shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
-              onClick={() => setShowLoginModal(true)}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Start Discussion
-            </Button>
-          </div>
-
-          <ForumSearch value={searchQuery} onChange={setSearchQuery} />
-        </motion.div>
-
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <aside className="lg:col-span-1">
-            <div className="lg:sticky lg:top-24">
-              <CategorySidebar
-                activeCategory={activeCategory}
-                onCategoryChange={setActiveCategory}
-              />
-            </div>
-          </aside>
-
-          {/* Discussion List */}
-          <main className="lg:col-span-3">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mb-4 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <MessageCircle className="w-4 h-4" />
-                <span>
-                  {filteredDiscussions.length} discussion
-                  {filteredDiscussions.length !== 1 ? "s" : ""}
-                </span>
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+                  Community Forums
+                </h1>
+                <p className="text-slate-600">
+                  Join discussions, share insights, and connect with fellow
+                  readers
+                </p>
               </div>
-            </motion.div>
+              <Button
+                size="lg"
+                className="shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+                onClick={() => setShowLoginModal(true)}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Start Discussion
+              </Button>
+            </div>
 
-            <AnimatePresence mode="wait">
-              {filteredDiscussions.length > 0 ? (
-                <div className="space-y-4">
-                  {filteredDiscussions.map((discussion, index) => (
-                    <DiscussionCard
-                      key={discussion.id}
-                      discussion={discussion}
-                      index={index}
-                    />
-                  ))}
+            <ForumSearch value={searchQuery} onChange={setSearchQuery} />
+          </motion.div>
+
+          <div className="grid lg:grid-cols-4 gap-8">
+            {/* Sidebar */}
+            <aside className="lg:col-span-1">
+              <div className="lg:sticky lg:top-24">
+                <CategorySidebar
+                  activeCategory={activeCategory}
+                  onCategoryChange={setActiveCategory}
+                />
+              </div>
+            </aside>
+
+            {/* Discussion List */}
+            <main className="lg:col-span-3">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mb-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>
+                    {filteredDiscussions.length} discussion
+                    {filteredDiscussions.length !== 1 ? "s" : ""}
+                  </span>
                 </div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="text-center py-16"
-                >
-                  <MessageCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                    No discussions found
-                  </h3>
-                  <p className="text-slate-500 mb-6">
-                    Try adjusting your search or category filter
-                  </p>
-                  <Button onClick={() => setShowLoginModal(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Start a New Discussion
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </main>
-        </div>
-      </div>
+              </motion.div>
 
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onLogin={() => router.push(routes.auth.signin)}
-        onSignup={() => router.push(routes.auth.signup)}
-      />
-    </div>
+              <AnimatePresence mode="wait">
+                {filteredDiscussions.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredDiscussions.map((discussion, index) => (
+                      <DiscussionCard
+                        key={discussion.id}
+                        discussion={discussion}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="text-center py-12 sm:py-16"
+                  >
+                    <MessageCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                      No discussions found
+                    </h3>
+                    <p className="text-slate-500 mb-6">
+                      Try adjusting your search or category filter
+                    </p>
+                    <Button onClick={() => setShowLoginModal(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Start a New Discussion
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </main>
+          </div>
+        </div>
+
+        {/* Login Modal */}
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => router.push(routes.auth.signin)}
+          onSignup={() => router.push(routes.auth.signup)}
+        />
+      </div>
+      <Footer />
+    </>
   );
 }

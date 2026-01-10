@@ -33,7 +33,7 @@ export default function SigninClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-4">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -53,10 +53,10 @@ export default function SigninClient() {
         >
           <button
             onClick={() => router.push(routes.home)}
-            className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity"
+            className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity cursor-pointer"
           >
             <BookOpen className="w-10 h-10 text-primary" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
               BooksExchange
             </h1>
           </button>
@@ -72,7 +72,7 @@ export default function SigninClient() {
           transition={{ delay: 0.1 }}
         >
           <Card className="border-slate-200 shadow-2xl">
-            <CardContent className="p-8">
+            <CardContent className="p-6 sm:p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div>
@@ -121,7 +121,7 @@ export default function SigninClient() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -149,7 +149,7 @@ export default function SigninClient() {
                   <button
                     type="button"
                     onClick={() => router.push(routes.auth.forgotPassword)}
-                    className="text-sm text-primary hover:underline font-medium"
+                    className="text-sm text-primary hover:underline font-medium cursor-pointer"
                   >
                     Forgot password?
                   </button>
@@ -225,7 +225,7 @@ export default function SigninClient() {
                 <button
                   type="button"
                   onClick={() => router.push(routes.auth.signup)}
-                  className="text-primary hover:underline font-semibold"
+                  className="text-primary hover:underline font-semibold cursor-pointer"
                 >
                   Sign up
                 </button>
@@ -242,8 +242,11 @@ export default function SigninClient() {
           className="text-center text-xs text-slate-500 mt-6"
         >
           By signing in, you agree to our{" "}
-          <button className="underline hover:text-slate-700">Terms</button> and{" "}
-          <button className="underline hover:text-slate-700">
+          <button className="underline hover:text-slate-700 cursor-pointer">
+            Terms
+          </button>{" "}
+          and{" "}
+          <button className="underline hover:text-slate-700 cursor-pointer">
             Privacy Policy
           </button>
         </motion.p>

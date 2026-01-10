@@ -74,7 +74,7 @@ export default function FeaturedBooks() {
   const router = useRouterWithProgress();
 
   return (
-    <section className="bg-white py-16 md:py-24 border-y border-slate-200">
+    <section className="bg-muted/30 py-16 sm:py-20 md:py-24 lg:py-28 border-y border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0 }}
@@ -83,10 +83,13 @@ export default function FeaturedBooks() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 md:mb-16"
         >
-          <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <div className="inline-block px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-medium mb-4">
+            Trending Now
+          </div>
+          <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">
             Featured Books
           </h3>
-          <p className="text-lg text-slate-600 mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8">
             Discover what's available in the community
           </p>
         </motion.div>
@@ -96,12 +99,12 @@ export default function FeaturedBooks() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
         >
           {MOCK_FEATURED_BOOKS.map((book) => (
             <motion.div key={book.id} variants={itemVariants}>
               <Card
-                className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200 group"
+                className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-border group bg-card"
                 onClick={() => router.push(routes.book.detail(book.id))}
               >
                 <div className="relative overflow-hidden">
@@ -111,23 +114,35 @@ export default function FeaturedBooks() {
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute top-3 right-3">
-                    <Badge variant="primary" size="sm" className="shadow-lg">
+                    <Badge
+                      variant="primary"
+                      size="sm"
+                      className="shadow-lg bg-primary text-primary-foreground"
+                    >
                       {book.points} Points
                     </Badge>
                   </div>
                 </div>
-                <CardContent className="p-4">
-                  <h4 className="font-semibold text-slate-900 mb-1 line-clamp-1">
+                <CardContent className="p-4 sm:p-5 pt-5 sm:pt-6">
+                  <h4 className="font-bold text-card-foreground mb-1 line-clamp-1">
                     {book.title}
                   </h4>
-                  <p className="text-sm text-slate-600 mb-2">{book.author}</p>
-                  <div className="flex justify-between items-center text-xs text-slate-500 mb-3">
-                    <span className="font-medium">{book.genre}</span>
-                    <Badge variant="success" size="sm">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {book.author}
+                  </p>
+                  <div className="flex justify-between items-center text-xs mb-3">
+                    <span className="font-medium text-muted-foreground">
+                      {book.genre}
+                    </span>
+                    <Badge
+                      variant="success"
+                      size="sm"
+                      className="bg-success/10 text-success"
+                    >
                       {book.condition}
                     </Badge>
                   </div>
-                  <div className="flex items-center text-xs text-slate-500">
+                  <div className="flex items-center text-xs text-muted-foreground">
                     <MapPin className="w-3 h-3 mr-1" />
                     {book.location}
                   </div>
@@ -141,13 +156,13 @@ export default function FeaturedBooks() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-10"
+          className="text-center mt-10 sm:mt-12"
         >
           <Button
             variant="outline"
             size="lg"
             onClick={() => router.push(routes.marketplace)}
-            className="shadow-md hover:shadow-lg transition-all"
+            className="shadow-md hover:shadow-lg transition-all border-2 border-border hover:border-primary hover:bg-primary/5 cursor-pointer"
           >
             View All Books
             <ArrowRight className="w-4 h-4 ml-2" />

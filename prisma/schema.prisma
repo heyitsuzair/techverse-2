@@ -9,20 +9,27 @@ datasource db {
   provider = "postgresql"
 }
 
-model Role {
-  id        String   @id @default(uuid())
-  name      String   @unique
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  password     String? // Nullable for Google OAuth users
+  name         String
+  phone        String?
+  profileImage String?
+  points       Int     @default(100)
+
+  // OAuth
+  googleId      String? @unique
+  emailVerified Boolean @default(false)
+
+  // Password Reset
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  users     User[]
+
+  @@index([email])
+  @@index([googleId])
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  roleId    String
-  role      Role     @relation(fields: [roleId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}

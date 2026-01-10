@@ -16,11 +16,11 @@ export default function PostCard({ post, index, onViewPost }) {
         className="cursor-pointer hover:shadow-lg transition-all border-slate-200"
         onClick={onViewPost}
       >
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-5 md:p-6">
           <div className="flex items-start gap-4">
             {/* User Avatar */}
             <div className="shrink-0">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg shadow-md">
+              <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg shadow-md">
                 {post.author.charAt(0).toUpperCase()}
               </div>
             </div>

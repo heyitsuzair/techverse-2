@@ -20,8 +20,8 @@ export default function DiscussionCard({ discussion, index }) {
         className="cursor-pointer hover:shadow-lg transition-all border-slate-200"
         onClick={() => router.push(routes.forums.book(discussion.bookId))}
       >
-        <CardContent className="p-6">
-          <div className="flex items-start gap-4">
+        <CardContent className="p-4 sm:p-5 md:p-6">
+          <div className="flex items-start gap-3 sm:gap-4">
             {/* Book Cover Thumbnail */}
             <div className="shrink-0">
               <img

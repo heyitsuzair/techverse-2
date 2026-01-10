@@ -66,11 +66,11 @@ export default function ForumPreview({
 
           <Button
             variant="outline"
-            className="w-full mt-6 shadow-md hover:shadow-lg transition-all"
+            className="w-full mt-6 shadow-md hover:shadow-lg transition-all cursor-pointer"
             onClick={onJoinForum}
           >
             <MessageSquare className="w-4 h-4 mr-2" />
-            Join Discussion Forum →
+            Join Discussion Forum
           </Button>
         </CardContent>
       </Card>

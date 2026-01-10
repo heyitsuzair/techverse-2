@@ -72,13 +72,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-poppins), sans-serif;
-  cursor: none;
+  /* cursor: none; */
 }
 
-/* Custom Cursor Styles */
-* {
+/* Custom Cursor Styles - Commented out for now */
+/* * {
   cursor: none !important;
-}
+} */
 
 /* Smooth scrolling */
 html {

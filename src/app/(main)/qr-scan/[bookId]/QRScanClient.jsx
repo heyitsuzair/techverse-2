@@ -302,7 +302,7 @@ export default function QRScanClient({ params }) {
           transition={{ delay: 0.4 }}
         >
           <Card className="border-primary/30 shadow-lg bg-gradient-to-r from-primary/5 to-secondary/5">
-            <CardContent className="p-8 text-center">
+            <CardContent className="p-6 sm:p-8 text-center">
               <h3 className="text-2xl font-bold text-slate-900 mb-3">
                 Want to add your story?
               </h3>
