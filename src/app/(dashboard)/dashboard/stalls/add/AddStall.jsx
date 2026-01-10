@@ -1,93 +1,86 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Card, 
-  CardContent,
-  Button,
-  Text,
-  Input,
-  Textarea
-} from "@/components/ui";
-import { 
-  MapPin,
-  Store,
-  Phone,
-  Mail,
-  Clock,
-  CheckCircle2,
-  Navigation
-} from "lucide-react";
+import { useRouterWithProgress } from "@/hooks";
+import routes from "@/config/routes";
+import { Card, Button, Text } from "@/components/ui";
+import AddStallModal from "@/app/(main)/exchange-points/AddStallModal";
+import { MapPin, CheckCircle2, ArrowLeft } from "lucide-react";
 
 export default function AddStall() {
+  const router = useRouterWithProgress();
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    stallName: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    phone: "",
-    email: "",
-    openingTime: "",
-    closingTime: "",
-    description: "",
-    latitude: "",
-    longitude: ""
-  });
+  const [newStall, setNewStall] = useState(null);
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSuccess = (stall) => {
+    setNewStall(stall);
     setSubmitted(true);
+    setIsModalOpen(false);
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setFormData({
-          ...formData,
-          latitude: position.coords.latitude.toFixed(6),
-          longitude: position.coords.longitude.toFixed(6)
-        });
-      });
-    }
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    router.push(routes.dashboard.stalls.myStalls);
   };
 
-  if (submitted) {
+  if (submitted && newStall) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md w-full mx-4">
-          <CardContent className="pt-6 text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Card className="max-w-md w-full">
+          <div className="p-6 text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
-            <Text variant="h2" className="mb-2">Stall Registered!</Text>
+            <Text variant="h2" className="mb-2">
+              Stall Created Successfully!
+            </Text>
             <Text variant="body" className="text-zinc-600 mb-6">
-              Your exchange point has been successfully registered and will appear on the map after verification.
+              Your exchange point is now live and visible to other users.
             </Text>
 
             <div className="bg-zinc-50 rounded-lg p-4 mb-6 text-left">
-              <Text variant="caption" className="text-zinc-600 mb-2">Stall Details</Text>
-              <Text variant="h4" className="mb-1">{formData.stallName}</Text>
-              <Text variant="body" className="text-zinc-600 mb-2">{formData.address}</Text>
-              <Text variant="caption" className="text-zinc-600">
-                Verification typically takes 1-2 business days
-              </Text>
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <Text variant="h4" className="mb-1">
+                    {newStall.name}
+                  </Text>
+                  <Text variant="body" className="text-zinc-600 text-sm">
+                    {newStall.locationAddress}
+                  </Text>
+                  {newStall.operatingHours && (
+                    <Text
+                      variant="caption"
+                      className="text-zinc-500 mt-1 block"
+                    >
+                      {newStall.operatingHours}
+                    </Text>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => setSubmitted(false)}>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setSubmitted(false);
+                  setNewStall(null);
+                  setIsModalOpen(true);
+                }}
+              >
                 Add Another
               </Button>
-              <Button variant="primary" className="flex-1">
-                View Stalls
+              <Button
+                className="flex-1"
+                onClick={() => router.push(routes.dashboard.stalls.myStalls)}
+              >
+                View My Stalls
               </Button>
             </div>
-          </CardContent>
+          </div>
         </Card>
       </div>
     );
@@ -95,200 +88,78 @@ export default function AddStall() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Text variant="h1" className="mb-2 flex items-center gap-3">
-            <Store className="w-8 h-8" />
-            Register Exchange Point
+          <button
+            onClick={() => router.push(routes.dashboard.stalls.myStalls)}
+            className="flex items-center text-zinc-600 hover:text-zinc-900 mb-4 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to My Stalls
+          </button>
+          <Text variant="h1" className="mb-2">
+            Add Exchange Stall
           </Text>
           <Text variant="body" className="text-zinc-600">
-            Add a physical location where users can exchange books
+            Create a physical location where users can exchange books
           </Text>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <Card>
-            <CardContent className="pt-6 space-y-6">
-              {/* Basic Information */}
-              <div>
-                <Text variant="h3" className="mb-4">Basic Information</Text>
-                <div className="space-y-4">
-                  <div>
-                    <Text variant="caption" className="mb-2">Stall/Store Name *</Text>
-                    <Input
-                      placeholder="Enter the name of your stall or store"
-                      value={formData.stallName}
-                      onChange={(e) => handleChange("stallName", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Text variant="caption" className="mb-2">Description</Text>
-                    <Textarea
-                      placeholder="Describe your exchange point, services offered, etc."
-                      value={formData.description}
-                      onChange={(e) => handleChange("description", e.target.value)}
-                      rows={4}
-                    />
-                  </div>
-                </div>
+        {/* Info Card */}
+        <Card className="mb-8">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-6 h-6 text-blue-600" />
               </div>
-
-              {/* Location Details */}
               <div>
-                <Text variant="h3" className="mb-4 flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  Location Details
+                <Text variant="h4" className="mb-2">
+                  What is an Exchange Stall?
                 </Text>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <Text variant="caption" className="mb-2">Street Address *</Text>
-                    <Input
-                      placeholder="Enter street address"
-                      value={formData.address}
-                      onChange={(e) => handleChange("address", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Text variant="caption" className="mb-2">City *</Text>
-                    <Input
-                      placeholder="City"
-                      value={formData.city}
-                      onChange={(e) => handleChange("city", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Text variant="caption" className="mb-2">State *</Text>
-                    <Input
-                      placeholder="State"
-                      value={formData.state}
-                      onChange={(e) => handleChange("state", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Text variant="caption" className="mb-2">Zip Code *</Text>
-                    <Input
-                      placeholder="Zip Code"
-                      value={formData.zipCode}
-                      onChange={(e) => handleChange("zipCode", e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Geo-location */}
-              <div>
-                <Text variant="h3" className="mb-4 flex items-center gap-2">
-                  <Navigation className="w-5 h-5" />
-                  Geo-location
+                <Text variant="body" className="text-zinc-600 mb-4">
+                  Exchange stalls are physical locations where community members
+                  can meet to exchange books. Your stall will appear on the map
+                  for others to discover and visit.
                 </Text>
-                <div className="grid md:grid-cols-2 gap-4 mb-3">
-                  <div>
-                    <Text variant="caption" className="mb-2">Latitude</Text>
-                    <Input
-                      placeholder="40.7128"
-                      value={formData.latitude}
-                      onChange={(e) => handleChange("latitude", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Text variant="caption" className="mb-2">Longitude</Text>
-                    <Input
-                      placeholder="-74.0060"
-                      value={formData.longitude}
-                      onChange={(e) => handleChange("longitude", e.target.value)}
-                    />
-                  </div>
-                </div>
-                <Button type="button" variant="outline" size="sm" onClick={getCurrentLocation}>
-                  <Navigation className="w-4 h-4 mr-2" />
-                  Use Current Location
-                </Button>
+                <ul className="space-y-2 text-sm text-zinc-600">
+                  <li className="flex items-center">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                    Visible to all users on the exchange points map
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                    Users can see available genres and contact you
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
+                    You can toggle availability anytime
+                  </li>
+                </ul>
               </div>
+            </div>
+          </div>
+        </Card>
 
-              {/* Contact Information */}
-              <div>
-                <Text variant="h3" className="mb-4">Contact Information</Text>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Text variant="caption" className="mb-2 flex items-center gap-2">
-                      <Phone className="w-4 h-4" />
-                      Phone Number *
-                    </Text>
-                    <Input
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.phone}
-                      onChange={(e) => handleChange("phone", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Text variant="caption" className="mb-2 flex items-center gap-2">
-                      <Mail className="w-4 h-4" />
-                      Email Address *
-                    </Text>
-                    <Input
-                      type="email"
-                      placeholder="contact@example.com"
-                      value={formData.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Business Hours */}
-              <div>
-                <Text variant="h3" className="mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Business Hours
-                </Text>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Text variant="caption" className="mb-2">Opening Time *</Text>
-                    <Input
-                      type="time"
-                      value={formData.openingTime}
-                      onChange={(e) => handleChange("openingTime", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Text variant="caption" className="mb-2">Closing Time *</Text>
-                    <Input
-                      type="time"
-                      value={formData.closingTime}
-                      onChange={(e) => handleChange("closingTime", e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-4 border-t border-zinc-200">
-                <Button type="submit" variant="primary" className="w-full">
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Register Exchange Point
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </form>
+        {/* Call to Action */}
+        <div className="text-center">
+          <Button
+            size="lg"
+            onClick={() => setIsModalOpen(true)}
+            className="px-8"
+          >
+            <MapPin className="w-5 h-5 mr-2" />
+            Create Exchange Stall
+          </Button>
+        </div>
       </div>
+
+      {/* Add Stall Modal */}
+      <AddStallModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

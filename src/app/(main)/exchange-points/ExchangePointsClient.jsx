@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Map, List, Search, Filter } from "lucide-react";
+import {
+  Map,
+  List,
+  Search,
+  Filter,
+  MapPin as MapPinIcon,
+  Loader2,
+} from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
@@ -12,99 +19,6 @@ import MapView from "./MapView";
 import StallCard from "./StallCard";
 import LoginModal from "../marketplace/LoginModal";
 
-const MOCK_EXCHANGE_POINTS = [
-  {
-    id: 1,
-    name: "Central Library Book Exchange",
-    address: "123 Main Street, New York, NY 10001",
-    rating: 4.8,
-    reviews: 145,
-    hours: "9 AM - 6 PM",
-    distance: 0.5,
-    isOpen: true,
-    phone: "(555) 123-4567",
-    imageUrl:
-      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=400",
-    tags: ["Library", "Indoor", "WiFi"],
-    books: 450,
-  },
-  {
-    id: 2,
-    name: "Washington Park Stall",
-    address: "456 Park Avenue, New York, NY 10002",
-    rating: 4.5,
-    reviews: 89,
-    hours: "10 AM - 5 PM",
-    distance: 1.2,
-    isOpen: true,
-    phone: "(555) 234-5678",
-    imageUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-    tags: ["Outdoor", "Park", "Weekend"],
-    books: 280,
-  },
-  {
-    id: 3,
-    name: "Brooklyn Community Center",
-    address: "789 Brooklyn Street, Brooklyn, NY 11201",
-    rating: 4.7,
-    reviews: 112,
-    hours: "11 AM - 7 PM",
-    distance: 2.3,
-    isOpen: false,
-    phone: "(555) 345-6789",
-    imageUrl:
-      "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=400",
-    tags: ["Community", "Indoor", "Events"],
-    books: 520,
-  },
-  {
-    id: 4,
-    name: "Queens Village Exchange",
-    address: "321 Queens Boulevard, Queens, NY 11375",
-    rating: 4.6,
-    reviews: 78,
-    hours: "8 AM - 8 PM",
-    distance: 3.1,
-    isOpen: true,
-    phone: "(555) 456-7890",
-    imageUrl:
-      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400",
-    tags: ["Village", "Morning", "Coffee"],
-    books: 340,
-  },
-  {
-    id: 5,
-    name: "Manhattan Book Hub",
-    address: "567 Manhattan Ave, Manhattan, NY 10025",
-    rating: 4.9,
-    reviews: 203,
-    hours: "9 AM - 9 PM",
-    distance: 1.8,
-    isOpen: true,
-    phone: "(555) 567-8901",
-    imageUrl:
-      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400",
-    tags: ["Popular", "Large", "Cafe"],
-    books: 680,
-  },
-  {
-    id: 6,
-    name: "Staten Island Reader's Corner",
-    address: "890 Staten Island Way, Staten Island, NY 10301",
-    rating: 4.4,
-    reviews: 56,
-    hours: "10 AM - 4 PM",
-    distance: 5.7,
-    isOpen: false,
-    phone: "(555) 678-9012",
-    imageUrl:
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400",
-    tags: ["Cozy", "Small", "Friendly"],
-    books: 180,
-  },
-];
-
 export default function ExchangePointsClient() {
   const router = useRouterWithProgress();
   const [viewMode, setViewMode] = useState("map"); // map or list
@@ -113,16 +27,86 @@ export default function ExchangePointsClient() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [filterOpen, setFilterOpen] = useState("all"); // all, open, closed
 
+  // New states for API integration
+  const [stalls, setStalls] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [radius, setRadius] = useState(10); // Default 10km radius
+
+  // Get user's current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          // Default to New York City if location access denied
+          setUserLocation({
+            lat: 40.7128,
+            lng: -74.006,
+          });
+        }
+      );
+    } else {
+      // Geolocation not supported - use default location
+      setUserLocation({
+        lat: 40.7128,
+        lng: -74.006,
+      });
+    }
+  }, []);
+
+  // Fetch stalls when user location is available
+  useEffect(() => {
+    if (userLocation) {
+      fetchStalls();
+    }
+  }, [userLocation, radius]);
+
+  const fetchStalls = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params = new URLSearchParams({
+        lat: userLocation.lat.toString(),
+        lng: userLocation.lng.toString(),
+        radius: radius.toString(),
+        isActive: "true",
+      });
+
+      const response = await fetch(`/api/stalls?${params}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch stalls");
+      }
+
+      setStalls(data.stalls || []);
+    } catch (err) {
+      console.error("Error fetching stalls:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Filter stalls
-  const filteredStalls = MOCK_EXCHANGE_POINTS.filter((stall) => {
+  const filteredStalls = stalls.filter((stall) => {
     const matchesSearch =
       stall.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      stall.address.toLowerCase().includes(searchQuery.toLowerCase());
+      stall.locationAddress.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesFilter =
       filterOpen === "all" ||
-      (filterOpen === "open" && stall.isOpen) ||
-      (filterOpen === "closed" && !stall.isOpen);
+      (filterOpen === "open" && stall.isActive) ||
+      (filterOpen === "closed" && !stall.isActive);
 
     return matchesSearch && matchesFilter;
   });
@@ -145,7 +129,9 @@ export default function ExchangePointsClient() {
                   Exchange Points
                 </h1>
                 <p className="text-slate-600">
-                  Find nearby locations to exchange books in person
+                  {userLocation
+                    ? `Found ${filteredStalls.length} exchange points within ${radius}km`
+                    : "Finding nearby locations to exchange books in person..."}
                 </p>
               </div>
 
@@ -189,6 +175,20 @@ export default function ExchangePointsClient() {
                 />
               </div>
 
+              {/* Radius Selector */}
+              <div className="flex items-center gap-2">
+                <select
+                  value={radius}
+                  onChange={(e) => setRadius(Number(e.target.value))}
+                  className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium bg-white hover:border-primary transition-all cursor-pointer"
+                >
+                  <option value={5}>Within 5km</option>
+                  <option value={10}>Within 10km</option>
+                  <option value={20}>Within 20km</option>
+                  <option value={50}>Within 50km</option>
+                </select>
+              </div>
+
               {/* Filter Buttons */}
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-slate-500" />
@@ -211,52 +211,79 @@ export default function ExchangePointsClient() {
             </div>
           </motion.div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-16">
+              <div className="text-center">
+                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+                <p className="text-slate-600">Loading exchange points...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12 sm:py-16">
+              <MapPinIcon className="w-16 h-16 text-red-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                Failed to Load Exchange Points
+              </h3>
+              <p className="text-slate-500 mb-4">{error}</p>
+              <Button onClick={fetchStalls} variant="primary">
+                Try Again
+              </Button>
+            </div>
+          )}
+
           {/* Content */}
-          <AnimatePresence mode="wait">
-            {viewMode === "map" ? (
-              <motion.div
-                key="map"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-              >
-                <MapView
-                  stalls={filteredStalls}
-                  selectedStall={selectedStall}
-                  onSelectStall={(stall) => setSelectedStall(stall)}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="list"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
-              >
-                {filteredStalls.length > 0 ? (
-                  filteredStalls.map((stall, index) => (
-                    <StallCard
-                      key={stall.id}
-                      stall={stall}
-                      index={index}
-                      onSelectStall={() => setShowLoginModal(true)}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-12 sm:py-16">
-                    <Map className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                      No exchange points found
-                    </h3>
-                    <p className="text-slate-500">
-                      Try adjusting your search or filters
-                    </p>
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {!loading && !error && (
+            <AnimatePresence mode="wait">
+              {viewMode === "map" ? (
+                <motion.div
+                  key="map"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                >
+                  <MapView
+                    stalls={filteredStalls}
+                    selectedStall={selectedStall}
+                    onSelectStall={(stall) => setSelectedStall(stall)}
+                    userLocation={userLocation}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="list"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-4"
+                >
+                  {filteredStalls.length > 0 ? (
+                    filteredStalls.map((stall, index) => (
+                      <StallCard
+                        key={stall.id}
+                        stall={stall}
+                        index={index}
+                        onSelectStall={() => setSelectedStall(stall)}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-12 sm:py-16">
+                      <MapPinIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                        No exchange points found
+                      </h3>
+                      <p className="text-slate-500">
+                        Try adjusting your search radius or filters
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
 
           {/* Login Modal */}
           <LoginModal

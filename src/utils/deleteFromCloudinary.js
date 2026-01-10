@@ -1,42 +1,47 @@
-import cloudinary from "../config/cloudinary";
-
-const deleteFromCloudinary = async (publicIds, invalidateCache = true) => {
+/**
+ * Delete file from Cloudinary via API route
+ * This works in client components by calling a secure backend endpoint
+ */
+const deleteFromCloudinary = async (imageUrl) => {
   try {
-    const deleteOptions = {
-      resource_type: "image",
-      type: "upload",
-      invalidate: invalidateCache,
-    };
-
-    if (typeof publicIds === "string") {
-      const result = await cloudinary.uploader.destroy(
-        publicIds,
-        deleteOptions
-      );
-      return {
-        public_id: publicIds,
-        result: result.result,
-      };
+    // If no URL provided, just return
+    if (!imageUrl) {
+      return { success: true };
     }
 
-    if (Array.isArray(publicIds)) {
-      const results = await cloudinary.api.delete_resources(publicIds, {
-        ...deleteOptions,
-        resource_type: "image",
-      });
+    // Extract public_id from Cloudinary URL
+    // URL format: https://res.cloudinary.com/[cloud-name]/image/upload/v[version]/[folder]/[public_id].[format]
+    const urlParts = imageUrl.split("/");
+    const uploadIndex = urlParts.indexOf("upload");
 
-      return {
-        deleted: results.deleted,
-        partial: results.partial,
-        failed: results.failed,
-      };
+    if (uploadIndex === -1) {
+      throw new Error("Invalid Cloudinary URL");
     }
 
-    throw new Error(
-      "Invalid input: publicIds must be a string or array of strings"
-    );
+    // Get everything after 'upload/v[version]/'
+    const pathAfterUpload = urlParts.slice(uploadIndex + 2).join("/");
+    // Remove file extension
+    const publicId = pathAfterUpload.replace(/\.[^/.]+$/, "");
+
+    // Call API route to delete (this needs to be created)
+    const response = await fetch("/api/cloudinary/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ publicId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Delete failed");
+    }
+
+    return await response.json();
   } catch (error) {
-    throw new Error(`Error deleting from Cloudinary: ${error.message}`);
+    console.error("Cloudinary delete error:", error);
+    // Don't throw error for delete failures, just log them
+    return { success: false, error: error.message };
   }
 };
 

@@ -1,13 +1,20 @@
-import apiClient from './apiClient';
-import endpoints from '@/config/endpoints';
+/**
+ * Payments API client functions
+ */
+
+import { get, post } from "@/config/network";
+import endpoints from "@/config/endpoints";
 
 /**
  * Get all available point packages and user's current points
  * @returns {Promise<{currentPoints: number|null, packages: Array}>}
  */
 export const getPackages = async () => {
-  const response = await apiClient.get(endpoints.payments.packages);
-  return response.data;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  return get(endpoints.payments.packages, headers);
 };
 
 /**
@@ -16,8 +23,16 @@ export const getPackages = async () => {
  * @returns {Promise<{sessionId: string, sessionUrl: string, package: object}>}
  */
 export const createCheckoutSession = async (packageId) => {
-  const response = await apiClient.post(endpoints.payments.createSession, {
-    packageId,
-  });
-  return response.data;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+
+  return post(
+    endpoints.payments.createSession,
+    { packageId },
+    { Authorization: `Bearer ${token}` }
+  );
 };

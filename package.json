@@ -26,6 +26,7 @@
     "cloudinary": "^2.5.1",
     "formik": "^2.4.9",
     "framer-motion": "^12.25.0",
+    "fs": "^0.0.1-security",
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.562.0",
