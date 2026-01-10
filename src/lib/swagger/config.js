@@ -42,6 +42,10 @@ export const swaggerConfig = {
       name: "Books",
       description: "Book listing and marketplace endpoints",
     },
+    {
+      name: "Socket Messages",
+      description: "Real-time chat message endpoints",
+    },
   ],
   components: {
     securitySchemes: {
@@ -378,6 +382,43 @@ export const swaggerConfig = {
             example: "7d",
           },
         },
+      },
+      ChatMessage: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "msg_1234567890_user_456",
+            description: "Unique message identifier",
+          },
+          roomId: {
+            type: "string",
+            example: "room_123",
+            description: "The ID of the chat room this message belongs to",
+          },
+          userId: {
+            type: "string",
+            example: "user_456",
+            description: "The ID of the user who sent the message",
+          },
+          userName: {
+            type: "string",
+            example: "John Doe",
+            description: "The name of the user who sent the message",
+          },
+          message: {
+            type: "string",
+            example: "Hello, everyone!",
+            description: "The message content",
+          },
+          timestamp: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+            description: "When the message was sent",
+          },
+        },
+        required: ["id", "roomId", "userId", "message", "timestamp"],
       },
       Error: {
         type: "object",
@@ -2086,6 +2127,254 @@ export const swaggerConfig = {
           },
           404: {
             description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/socket/messages": {
+      get: {
+        tags: ["Socket Messages"],
+        summary: "Get chat messages for a specific room",
+        description: "Retrieve paginated messages from a chat room",
+        parameters: [
+          {
+            in: "query",
+            name: "roomId",
+            required: true,
+            schema: {
+              type: "string",
+            },
+            description: "The ID of the chat room",
+            example: "room_123",
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: {
+              type: "integer",
+              default: 50,
+            },
+            description: "Maximum number of messages to return",
+            example: 50,
+          },
+          {
+            in: "query",
+            name: "offset",
+            schema: {
+              type: "integer",
+              default: 0,
+            },
+            description: "Number of messages to skip",
+            example: 0,
+          },
+        ],
+        responses: {
+          200: {
+            description: "Messages retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    roomId: {
+                      type: "string",
+                      example: "room_123",
+                    },
+                    messages: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/ChatMessage",
+                      },
+                    },
+                    total: {
+                      type: "integer",
+                      example: 100,
+                    },
+                    limit: {
+                      type: "integer",
+                      example: 50,
+                    },
+                    offset: {
+                      type: "integer",
+                      example: 0,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - roomId is required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Socket Messages"],
+        summary: "Send a new chat message",
+        description:
+          "Create and store a new message in a chat room (can also be broadcasted via Socket.IO)",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["roomId", "userId", "message"],
+                properties: {
+                  roomId: {
+                    type: "string",
+                    description: "The ID of the chat room",
+                    example: "room_123",
+                  },
+                  userId: {
+                    type: "string",
+                    description: "The ID of the user sending the message",
+                    example: "user_456",
+                  },
+                  userName: {
+                    type: "string",
+                    description: "The name of the user sending the message",
+                    example: "John Doe",
+                  },
+                  message: {
+                    type: "string",
+                    description: "The message content",
+                    example: "Hello, everyone!",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Message sent successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      $ref: "#/components/schemas/ChatMessage",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - missing required fields",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Socket Messages"],
+        summary: "Delete a chat message",
+        description: "Remove a specific message from a chat room",
+        parameters: [
+          {
+            in: "query",
+            name: "messageId",
+            required: true,
+            schema: {
+              type: "string",
+            },
+            description: "The ID of the message to delete",
+            example: "msg_1234567890_user_456",
+          },
+          {
+            in: "query",
+            name: "roomId",
+            required: true,
+            schema: {
+              type: "string",
+            },
+            description: "The ID of the chat room",
+            example: "room_123",
+          },
+        ],
+        responses: {
+          200: {
+            description: "Message deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Message deleted",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - missing required parameters",
             content: {
               "application/json": {
                 schema: {
