@@ -234,13 +234,14 @@ export default function SignupPage() {
 
               <div className="text-center text-sm text-zinc-600 mt-6">
                 Already have an account?{" "}
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => router.push(routes.auth.signin)}
                   className="text-primary font-semibold hover:underline"
                 >
                   Sign In
-                </button>
+                </Button>
               </div>
             </form>
           </CardContent>

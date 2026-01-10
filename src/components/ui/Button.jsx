@@ -20,7 +20,7 @@ export function Button({
       "bg-secondary text-secondary-foreground hover:opacity-90 focus:ring-secondary",
     outline:
       "border-2 border-primary bg-transparent text-primary hover:bg-primary/10 focus:ring-primary",
-    ghost: "bg-transparent text-zinc-900 hover:bg-zinc-100 focus:ring-primary",
+    ghost: "bg-transparent text-foreground hover:bg-foreground/5 focus:ring-primary",
     danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
   };
 

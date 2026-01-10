@@ -18,9 +18,9 @@ export function Input({
         className={`
           w-full px-4 py-2.5 rounded-lg border
           bg-white
-          text-zinc-900
+          text-foreground
           border-zinc-300
-          placeholder:text-zinc-400
+          placeholder:text-foreground/40
           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors

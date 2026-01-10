@@ -315,28 +315,31 @@ export default function LandingPage() {
               <h5 className="font-semibold mb-3">Explore</h5>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => router.push(routes.marketplace)}
-                    className="hover:text-white transition-colors"
+                    className="hover:text-white transition-colors p-0 h-auto text-zinc-400"
                   >
                     Marketplace
-                  </button>
+                  </Button>
                 </li>
                 <li>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => router.push(routes.forums.index)}
-                    className="hover:text-white transition-colors"
+                    className="hover:text-white transition-colors p-0 h-auto text-zinc-400"
                   >
                     Forums
-                  </button>
+                  </Button>
                 </li>
                 <li>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => router.push(routes.exchangePoints)}
-                    className="hover:text-white transition-colors"
+                    className="hover:text-white transition-colors p-0 h-auto text-zinc-400"
                   >
                     Exchange Points
-                  </button>
+                  </Button>
                 </li>
               </ul>
             </div>

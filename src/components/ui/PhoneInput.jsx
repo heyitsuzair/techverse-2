@@ -121,7 +121,7 @@ export function PhoneInput({
                         <span className="text-lg flex-shrink-0">
                           {country.flag}
                         </span>
-                        <span className="text-sm font-medium text-zinc-900 flex-shrink-0 w-16">
+                        <span className="text-sm font-medium text-foreground flex-shrink-0 w-16">
                           {country.code}
                         </span>
                         <span className="text-sm text-zinc-700 truncate">

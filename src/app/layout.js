@@ -1,13 +1,5 @@
-import { Poppins } from "next/font/google";
 import { Providers } from "@/app/providers";
 import "./globals.css";
-
-const poppins = Poppins({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  display: "swap",
-});
 
 export const metadata = {
   title: "TECHVERSE 2.0",
@@ -17,10 +9,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable} font-sans antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body style={{ fontFamily: "'Poppins', sans-serif" }}>
         <Providers>{children}</Providers>
       </body>
     </html>
   );
-  eckboxes;
 }
