@@ -91,7 +91,7 @@ export default function HowItWorks() {
             const Icon = item.icon;
             return (
               <motion.div key={item.step} variants={itemVariants}>
-                <Card className="relative text-center hover:shadow-2xl transition-all duration-300 border-border h-full group bg-card overflow-hidden cursor-pointer">
+                <Card className="relative text-center hover:shadow-2xl transition-all duration-300 border-border h-full group bg-card overflow-hidden cursor-pointer p-2">
                   {/* Decorative gradient on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 transition-all duration-300 z-0"></div>
 

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@bprogress/next": "^3.2.12",
+    "@google/generative-ai": "^0.24.1",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@react-google-maps/api": "^2.20.8",

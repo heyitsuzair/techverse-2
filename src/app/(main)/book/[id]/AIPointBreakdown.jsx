@@ -65,11 +65,11 @@ export default function AIPointBreakdown({ points = 85 }) {
                     >
                       <Icon className={`w-5 h-5 ${item.color}`} />
                     </div>
-                    <span className="text-sm text-slate-700 font-medium">
+                    <span className="text-xs md:text-sm text-slate-700 font-medium">
                       {item.label}
                     </span>
                   </div>
-                  <Badge variant="primary" size="sm" className="font-bold">
+                  <Badge variant="primary" size="sm" className="font-semibold md:font-bold text-xs w-20 flex items-center justify-center">
                     +{item.value} pts
                   </Badge>
                 </motion.div>
@@ -81,7 +81,7 @@ export default function AIPointBreakdown({ points = 85 }) {
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-6 h-6 text-primary" />
                   <span className="font-bold text-lg text-slate-900">
-                    Total Exchange Points
+                    <span className="text-sm md:text-base">Total Exchange Points</span>
                   </span>
                 </div>
                 <span className="font-bold text-3xl text-primary">

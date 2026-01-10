@@ -26,3 +26,4 @@ export {
   TimePickerInput,
   DateTimePickerInput,
 } from "./DatePicker";
+export { Modal } from "./Modal";

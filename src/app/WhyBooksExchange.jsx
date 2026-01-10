@@ -93,7 +93,7 @@ export default function WhyBooksExchange() {
                     >
                       <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
-                    <h4 className="text-lg sm:text-xl font-bold text-card-foreground mb-2 sm:mb-3">
+                    <h4 className="text-lg sm:text-xl font-bold text-card-foreground mb-2 sm:mb-3 whitespace-normal">
                       {item.title}
                     </h4>
                     <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">

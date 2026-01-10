@@ -6,14 +6,16 @@ import uploadToCloudinary from "@/utils/uploadToCloudinary";
 import deleteFromCloudinary from "@/utils/deleteFromCloudinary";
 import { extractPublicId, isCloudinaryUrl } from "@/utils/cloudinaryHelpers";
 import { deleteQRCode } from "@/utils/qrcode";
+import { getBookValueBreakdown } from "@/utils/bookValuation";
+import { getCompleteBookAnalytics } from "@/utils/bookAnalytics";
 
 /**
  * GET /api/books/:id
- * Get book details by ID
+ * Get book details by ID with AI valuation
  */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -53,9 +55,29 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Book not found" }, { status: 404 });
     }
 
+    // Get AI-powered valuation breakdown
+    let valuation = null;
+    try {
+      valuation = await getBookValueBreakdown(id);
+    } catch (error) {
+      console.error("Failed to get book valuation:", error);
+      // Continue without valuation if it fails
+    }
+
+    // Get complete analytics (point value trend, reading journey, community discussions)
+    let analytics = null;
+    try {
+      analytics = await getCompleteBookAnalytics(id);
+    } catch (error) {
+      console.error("Failed to get book analytics:", error);
+      // Continue without analytics if it fails
+    }
+
     return NextResponse.json({
       success: true,
       book,
+      valuation,
+      analytics,
     });
   } catch (error) {
     console.error("Get book error:", error);
@@ -72,7 +94,7 @@ export async function GET(request, { params }) {
  */
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -228,7 +250,7 @@ export async function PUT(request, { params }) {
  */
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
