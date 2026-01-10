@@ -16,8 +16,8 @@ export default function StallCard({ stall, index, onSelectStall }) {
         className="cursor-pointer hover:shadow-lg transition-all border-slate-200"
         onClick={onSelectStall}
       >
-        <CardContent className="p-5">
-          <div className="flex gap-4">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex gap-3 sm:gap-4">
             {/* Image */}
             <div className="shrink-0">
               <img

@@ -92,7 +92,7 @@ export default function ResetPasswordClient() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-card rounded-2xl shadow-xl p-8 text-center border border-border relative z-10"
+          className="max-w-md w-full bg-card rounded-2xl shadow-xl p-6 sm:p-8 text-center border border-border relative z-10"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -156,7 +156,7 @@ export default function ResetPasswordClient() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-card rounded-2xl shadow-xl p-8 border border-border"
+          className="bg-card rounded-2xl shadow-xl p-6 sm:p-8 border border-border"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* New Password */}

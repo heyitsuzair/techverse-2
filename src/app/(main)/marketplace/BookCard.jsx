@@ -54,7 +54,7 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
           </div>
         </div>
 
-        <CardContent className="p-5">
+        <CardContent className="p-4 sm:p-5">
           <div className="flex justify-between items-start mb-3">
             <Badge
               variant={getConditionVariant(book.condition)}

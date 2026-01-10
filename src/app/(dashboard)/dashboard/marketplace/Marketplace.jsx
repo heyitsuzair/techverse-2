@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
+import {
+  Card,
+  CardHeader,
+  CardTitle,
   CardContent,
   Button,
   Text,
   Input,
   Select,
-  Badge
+  Badge,
 } from "@/components/ui";
-import { 
+import {
   Search,
   Filter,
   BookOpen,
@@ -21,14 +21,14 @@ import {
   MapPin,
   Star,
   TrendingUp,
-  X
+  X,
 } from "lucide-react";
 
 // Mock Data
 const MOCK_BOOKS = [
-  { 
-    id: 1, 
-    title: "Moby Dick", 
+  {
+    id: 1,
+    title: "Moby Dick",
     author: "Herman Melville",
     genre: "Adventure",
     condition: "Excellent",
@@ -37,11 +37,11 @@ const MOCK_BOOKS = [
     distance: "2.5 miles",
     owner: "John Anderson",
     rating: 4.8,
-    available: true
+    available: true,
   },
-  { 
-    id: 2, 
-    title: "The Catcher in the Rye", 
+  {
+    id: 2,
+    title: "The Catcher in the Rye",
     author: "J.D. Salinger",
     genre: "Fiction",
     condition: "Good",
@@ -50,11 +50,11 @@ const MOCK_BOOKS = [
     distance: "5 miles",
     owner: "Emily White",
     rating: 4.9,
-    available: true
+    available: true,
   },
-  { 
-    id: 3, 
-    title: "Brave New World", 
+  {
+    id: 3,
+    title: "Brave New World",
     author: "Aldous Huxley",
     genre: "Dystopian",
     condition: "Like New",
@@ -63,11 +63,11 @@ const MOCK_BOOKS = [
     distance: "8 miles",
     owner: "Mike Johnson",
     rating: 4.7,
-    available: true
+    available: true,
   },
-  { 
-    id: 4, 
-    title: "The Odyssey", 
+  {
+    id: 4,
+    title: "The Odyssey",
     author: "Homer",
     genre: "Epic",
     condition: "Fair",
@@ -76,11 +76,11 @@ const MOCK_BOOKS = [
     distance: "10 miles",
     owner: "Sarah Brown",
     rating: 4.6,
-    available: false
+    available: false,
   },
-  { 
-    id: 5, 
-    title: "Crime and Punishment", 
+  {
+    id: 5,
+    title: "Crime and Punishment",
     author: "Fyodor Dostoevsky",
     genre: "Psychological Fiction",
     condition: "Good",
@@ -89,11 +89,11 @@ const MOCK_BOOKS = [
     distance: "3 miles",
     owner: "David Lee",
     rating: 4.9,
-    available: true
+    available: true,
   },
-  { 
-    id: 6, 
-    title: "Wuthering Heights", 
+  {
+    id: 6,
+    title: "Wuthering Heights",
     author: "Emily Brontë",
     genre: "Gothic Fiction",
     condition: "Excellent",
@@ -102,13 +102,29 @@ const MOCK_BOOKS = [
     distance: "12 miles",
     owner: "Lisa Garcia",
     rating: 4.5,
-    available: true
+    available: true,
   },
 ];
 
-const GENRES = ["All Genres", "Fiction", "Non-Fiction", "Mystery", "Romance", "Science Fiction", "Fantasy", "Adventure", "Dystopian"];
+const GENRES = [
+  "All Genres",
+  "Fiction",
+  "Non-Fiction",
+  "Mystery",
+  "Romance",
+  "Science Fiction",
+  "Fantasy",
+  "Adventure",
+  "Dystopian",
+];
 const CONDITIONS = ["All Conditions", "Like New", "Excellent", "Good", "Fair"];
-const SORT_OPTIONS = ["Nearest", "Lowest Points", "Highest Points", "Newest First", "Highest Rated"];
+const SORT_OPTIONS = [
+  "Nearest",
+  "Lowest Points",
+  "Highest Points",
+  "Newest First",
+  "Highest Rated",
+];
 
 export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,15 +135,26 @@ export default function Marketplace() {
   const [maxPoints, setMaxPoints] = useState("");
   const [maxDistance, setMaxDistance] = useState("");
 
-  const filteredBooks = MOCK_BOOKS.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGenre = selectedGenre === "All Genres" || book.genre === selectedGenre;
-    const matchesCondition = selectedCondition === "All Conditions" || book.condition === selectedCondition;
+  const filteredBooks = MOCK_BOOKS.filter((book) => {
+    const matchesSearch =
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesGenre =
+      selectedGenre === "All Genres" || book.genre === selectedGenre;
+    const matchesCondition =
+      selectedCondition === "All Conditions" ||
+      book.condition === selectedCondition;
     const matchesPoints = !maxPoints || book.points <= parseInt(maxPoints);
-    const matchesDistance = !maxDistance || parseFloat(book.distance) <= parseFloat(maxDistance);
-    
-    return matchesSearch && matchesGenre && matchesCondition && matchesPoints && matchesDistance;
+    const matchesDistance =
+      !maxDistance || parseFloat(book.distance) <= parseFloat(maxDistance);
+
+    return (
+      matchesSearch &&
+      matchesGenre &&
+      matchesCondition &&
+      matchesPoints &&
+      matchesDistance
+    );
   });
 
   const clearFilters = () => {
@@ -168,7 +195,7 @@ export default function Marketplace() {
                     className="pl-10"
                   />
                 </div>
-                <Button 
+                <Button
                   variant={showFilters ? "primary" : "outline"}
                   onClick={() => setShowFilters(!showFilters)}
                 >
@@ -179,22 +206,41 @@ export default function Marketplace() {
 
               {/* Quick Filters */}
               <div className="flex flex-wrap gap-3">
-                <Select value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
-                  {GENRES.map(genre => (
-                    <option key={genre} value={genre}>{genre}</option>
+                <Select
+                  value={selectedGenre}
+                  onChange={(e) => setSelectedGenre(e.target.value)}
+                >
+                  {GENRES.map((genre) => (
+                    <option key={genre} value={genre}>
+                      {genre}
+                    </option>
                   ))}
                 </Select>
-                <Select value={selectedCondition} onChange={(e) => setSelectedCondition(e.target.value)}>
-                  {CONDITIONS.map(condition => (
-                    <option key={condition} value={condition}>{condition}</option>
+                <Select
+                  value={selectedCondition}
+                  onChange={(e) => setSelectedCondition(e.target.value)}
+                >
+                  {CONDITIONS.map((condition) => (
+                    <option key={condition} value={condition}>
+                      {condition}
+                    </option>
                   ))}
                 </Select>
-                <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                  {SORT_OPTIONS.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                <Select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </Select>
-                {(searchQuery || selectedGenre !== "All Genres" || selectedCondition !== "All Conditions" || maxPoints || maxDistance) && (
+                {(searchQuery ||
+                  selectedGenre !== "All Genres" ||
+                  selectedCondition !== "All Conditions" ||
+                  maxPoints ||
+                  maxDistance) && (
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
                     <X className="w-4 h-4 mr-1" />
                     Clear All
@@ -206,7 +252,9 @@ export default function Marketplace() {
               {showFilters && (
                 <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-zinc-200">
                   <div>
-                    <Text variant="caption" className="mb-2">Max Points</Text>
+                    <Text variant="caption" className="mb-2">
+                      Max Points
+                    </Text>
                     <Input
                       type="number"
                       placeholder="Enter maximum points"
@@ -215,7 +263,9 @@ export default function Marketplace() {
                     />
                   </div>
                   <div>
-                    <Text variant="caption" className="mb-2">Max Distance (miles)</Text>
+                    <Text variant="caption" className="mb-2">
+                      Max Distance (miles)
+                    </Text>
                     <Input
                       type="number"
                       placeholder="Enter maximum distance"
@@ -232,11 +282,14 @@ export default function Marketplace() {
         {/* Results Count */}
         <div className="flex items-center justify-between mb-6">
           <Text variant="body" className="text-zinc-600">
-            Found {filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''}
+            Found {filteredBooks.length} book
+            {filteredBooks.length !== 1 ? "s" : ""}
           </Text>
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-zinc-500" />
-            <Text variant="caption" className="text-zinc-600">Sorted by: {sortBy}</Text>
+            <Text variant="caption" className="text-zinc-600">
+              Sorted by: {sortBy}
+            </Text>
           </div>
         </div>
 
@@ -257,27 +310,43 @@ export default function Marketplace() {
                   </Badge>
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                    <Text variant="caption" className="font-semibold">{book.rating}</Text>
+                    <Text variant="caption" className="font-semibold">
+                      {book.rating}
+                    </Text>
                   </div>
                 </div>
 
                 {/* Book Info */}
-                <Text variant="h4" className="mb-1 line-clamp-1">{book.title}</Text>
-                <Text variant="body" className="text-zinc-600 mb-3 text-sm">by {book.author}</Text>
+                <Text variant="h4" className="mb-1 line-clamp-1">
+                  {book.title}
+                </Text>
+                <Text variant="body" className="text-zinc-600 mb-3 text-sm">
+                  by {book.author}
+                </Text>
 
                 {/* Details */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm">
-                    <Badge variant="default" className="text-xs">{book.genre}</Badge>
-                    <Badge variant="default" className="text-xs">{book.condition}</Badge>
+                    <Badge variant="default" className="text-xs">
+                      {book.genre}
+                    </Badge>
+                    <Badge variant="default" className="text-xs">
+                      {book.condition}
+                    </Badge>
                   </div>
                   <div className="flex items-center gap-2 text-zinc-600">
                     <MapPin className="w-4 h-4" />
-                    <Text variant="caption">{book.location} • {book.distance}</Text>
+                    <Text variant="caption">
+                      {book.location} • {book.distance}
+                    </Text>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Text variant="caption" className="text-zinc-600">Owner: {book.owner}</Text>
-                    <Text variant="body" className="font-bold text-amber-600">{book.points} pts</Text>
+                    <Text variant="caption" className="text-zinc-600">
+                      Owner: {book.owner}
+                    </Text>
+                    <Text variant="body" className="font-bold text-amber-600">
+                      {book.points} pts
+                    </Text>
                   </div>
                 </div>
 
@@ -314,9 +383,11 @@ export default function Marketplace() {
         {/* No Results */}
         {filteredBooks.length === 0 && (
           <Card>
-            <CardContent className="py-12 text-center">
+            <CardContent className="py-8 sm:py-12 text-center">
               <Search className="w-16 h-16 text-zinc-400 mx-auto mb-4" />
-              <Text variant="h3" className="mb-2">No books found</Text>
+              <Text variant="h3" className="mb-2">
+                No books found
+              </Text>
               <Text variant="body" className="text-zinc-600 mb-4">
                 Try adjusting your filters or search terms
               </Text>

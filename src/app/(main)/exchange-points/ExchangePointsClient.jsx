@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Map, List, Search, Filter } from "lucide-react";
+import { Map, List, Search, Filter } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import Navigation from "@/app/Navigation";
+import Footer from "@/app/Footer";
 import MapView from "./MapView";
 import StallCard from "./StallCard";
 import LoginModal from "../marketplace/LoginModal";
@@ -126,177 +128,147 @@ export default function ExchangePointsClient() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Navigation */}
-      <nav className="border-b border-slate-200/60 bg-white/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              onClick={() => router.push(routes.home)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <BookOpen className="w-8 h-8 text-primary" />
-              <h1 className="hidden sm:block text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                BooksExchange
-              </h1>
-            </motion.button>
+    <>
+      <Navigation />
 
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push(routes.auth.signin)}
-              >
-                Login
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => router.push(routes.auth.signup)}
-                className="shadow-md"
-              >
-                Sign Up
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+                  Exchange Points
+                </h1>
+                <p className="text-slate-600">
+                  Find nearby locations to exchange books in person
+                </p>
+              </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-                Exchange Points
-              </h1>
-              <p className="text-slate-600">
-                Find nearby locations to exchange books in person
-              </p>
-            </div>
-
-            {/* View Toggle */}
-            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button
-                onClick={() => setViewMode("map")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all ${
-                  viewMode === "map"
-                    ? "bg-white text-primary shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <Map className="w-4 h-4" />
-                <span>Map</span>
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all ${
-                  viewMode === "list"
-                    ? "bg-white text-primary shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <List className="w-4 h-4" />
-                <span>List</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Search & Filters */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <Input
-                type="text"
-                placeholder="Search by name or location..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 shadow-sm"
-              />
-            </div>
-
-            {/* Filter Buttons */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-slate-500" />
-              <div className="flex gap-2">
-                {["all", "open", "closed"].map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setFilterOpen(filter)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      filterOpen === filter
-                        ? "bg-primary text-white shadow-sm"
-                        : "bg-white border border-slate-200 text-slate-700 hover:border-primary"
-                    }`}
-                  >
-                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                  </button>
-                ))}
+              {/* View Toggle */}
+              <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
+                <button
+                  onClick={() => setViewMode("map")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all cursor-pointer ${
+                    viewMode === "map"
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  <Map className="w-4 h-4" />
+                  <span>Map</span>
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all cursor-pointer ${
+                    viewMode === "list"
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span>List</span>
+                </button>
               </div>
             </div>
-          </div>
-        </motion.div>
 
-        {/* Content */}
-        <AnimatePresence mode="wait">
-          {viewMode === "map" ? (
-            <motion.div
-              key="map"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <MapView
-                stalls={filteredStalls}
-                selectedStall={selectedStall}
-                onSelectStall={(stall) => setSelectedStall(stall)}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="list"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-4"
-            >
-              {filteredStalls.length > 0 ? (
-                filteredStalls.map((stall, index) => (
-                  <StallCard
-                    key={stall.id}
-                    stall={stall}
-                    index={index}
-                    onSelectStall={() => setShowLoginModal(true)}
-                  />
-                ))
-              ) : (
-                <div className="text-center py-16">
-                  <Map className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                    No exchange points found
-                  </h3>
-                  <p className="text-slate-500">
-                    Try adjusting your search or filters
-                  </p>
+            {/* Search & Filters */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="Search by name or location..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 shadow-sm"
+                />
+              </div>
+
+              {/* Filter Buttons */}
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-slate-500" />
+                <div className="flex gap-2">
+                  {["all", "open", "closed"].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setFilterOpen(filter)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                        filterOpen === filter
+                          ? "bg-primary text-white shadow-sm"
+                          : "bg-white border border-slate-200 text-slate-700 hover:border-primary"
+                      }`}
+                    >
+                      {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                    </button>
+                  ))}
                 </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <AnimatePresence mode="wait">
+            {viewMode === "map" ? (
+              <motion.div
+                key="map"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+              >
+                <MapView
+                  stalls={filteredStalls}
+                  selectedStall={selectedStall}
+                  onSelectStall={(stall) => setSelectedStall(stall)}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="list"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-4"
+              >
+                {filteredStalls.length > 0 ? (
+                  filteredStalls.map((stall, index) => (
+                    <StallCard
+                      key={stall.id}
+                      stall={stall}
+                      index={index}
+                      onSelectStall={() => setShowLoginModal(true)}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-12 sm:py-16">
+                    <Map className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                      No exchange points found
+                    </h3>
+                    <p className="text-slate-500">
+                      Try adjusting your search or filters
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Login Modal */}
+          <LoginModal
+            isOpen={showLoginModal}
+            onClose={() => setShowLoginModal(false)}
+            onLogin={() => router.push(routes.auth.signin)}
+            onSignup={() => router.push(routes.auth.signup)}
+          />
+        </div>
       </div>
 
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onLogin={() => router.push(routes.auth.signin)}
-        onSignup={() => router.push(routes.auth.signup)}
-      />
-    </div>
+      <Footer />
+    </>
   );
 }

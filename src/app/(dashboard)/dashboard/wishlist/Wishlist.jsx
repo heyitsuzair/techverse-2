@@ -1,14 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Card, 
-  CardContent,
-  Button,
-  Text,
-  Badge
-} from "@/components/ui";
-import { 
+import { Card, CardContent, Button, Text, Badge } from "@/components/ui";
+import {
   Heart,
   BookOpen,
   Bell,
@@ -16,52 +10,52 @@ import {
   Trash2,
   MessageCircle,
   MapPin,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 
 // Mock Data
 const MOCK_WISHLIST = [
-  { 
-    id: 1, 
-    title: "The Lord of the Rings", 
+  {
+    id: 1,
+    title: "The Lord of the Rings",
     author: "J.R.R. Tolkien",
     genre: "Fantasy",
     alertsEnabled: true,
     available: false,
     waitlistCount: 5,
-    estimatedAvailability: "2-3 weeks"
+    estimatedAvailability: "2-3 weeks",
   },
-  { 
-    id: 2, 
-    title: "Harry Potter and the Sorcerer's Stone", 
+  {
+    id: 2,
+    title: "Harry Potter and the Sorcerer's Stone",
     author: "J.K. Rowling",
     genre: "Fantasy",
     alertsEnabled: true,
     available: true,
     location: "Brooklyn, NY",
     points: 180,
-    owner: "Mike Johnson"
+    owner: "Mike Johnson",
   },
-  { 
-    id: 3, 
-    title: "The Alchemist", 
+  {
+    id: 3,
+    title: "The Alchemist",
     author: "Paulo Coelho",
     genre: "Fiction",
     alertsEnabled: false,
     available: false,
     waitlistCount: 12,
-    estimatedAvailability: "4-6 weeks"
+    estimatedAvailability: "4-6 weeks",
   },
-  { 
-    id: 4, 
-    title: "Educated", 
+  {
+    id: 4,
+    title: "Educated",
     author: "Tara Westover",
     genre: "Biography",
     alertsEnabled: true,
     available: true,
     location: "Manhattan, NY",
     points: 200,
-    owner: "Sarah White"
+    owner: "Sarah White",
   },
 ];
 
@@ -69,17 +63,19 @@ export default function Wishlist() {
   const [wishlist, setWishlist] = useState(MOCK_WISHLIST);
 
   const toggleAlert = (id) => {
-    setWishlist(wishlist.map(book => 
-      book.id === id ? { ...book, alertsEnabled: !book.alertsEnabled } : book
-    ));
+    setWishlist(
+      wishlist.map((book) =>
+        book.id === id ? { ...book, alertsEnabled: !book.alertsEnabled } : book
+      )
+    );
   };
 
   const removeFromWishlist = (id) => {
-    setWishlist(wishlist.filter(book => book.id !== id));
+    setWishlist(wishlist.filter((book) => book.id !== id));
   };
 
-  const availableBooks = wishlist.filter(book => book.available);
-  const unavailableBooks = wishlist.filter(book => !book.available);
+  const availableBooks = wishlist.filter((book) => book.available);
+  const unavailableBooks = wishlist.filter((book) => !book.available);
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -101,7 +97,9 @@ export default function Wishlist() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Text variant="caption" className="text-zinc-600 mb-1">Total Wishlist</Text>
+                  <Text variant="caption" className="text-zinc-600 mb-1">
+                    Total Wishlist
+                  </Text>
                   <Text variant="h2">{wishlist.length}</Text>
                 </div>
                 <Heart className="w-10 h-10 text-red-500 fill-red-500 opacity-20" />
@@ -113,8 +111,12 @@ export default function Wishlist() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Text variant="caption" className="text-zinc-600 mb-1">Available Now</Text>
-                  <Text variant="h2" className="text-green-600">{availableBooks.length}</Text>
+                  <Text variant="caption" className="text-zinc-600 mb-1">
+                    Available Now
+                  </Text>
+                  <Text variant="h2" className="text-green-600">
+                    {availableBooks.length}
+                  </Text>
                 </div>
                 <CheckCircle2 className="w-10 h-10 text-green-500 opacity-20" />
               </div>
@@ -125,9 +127,11 @@ export default function Wishlist() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Text variant="caption" className="text-zinc-600 mb-1">Alerts Active</Text>
+                  <Text variant="caption" className="text-zinc-600 mb-1">
+                    Alerts Active
+                  </Text>
                   <Text variant="h2" className="text-primary">
-                    {wishlist.filter(b => b.alertsEnabled).length}
+                    {wishlist.filter((b) => b.alertsEnabled).length}
                   </Text>
                 </div>
                 <Bell className="w-10 h-10 text-primary opacity-20" />
@@ -141,7 +145,9 @@ export default function Wishlist() {
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
-              <Text variant="h3" className="text-green-600">Available Now ({availableBooks.length})</Text>
+              <Text variant="h3" className="text-green-600">
+                Available Now ({availableBooks.length})
+              </Text>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               {availableBooks.map((book) => (
@@ -154,32 +160,56 @@ export default function Wishlist() {
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <Text variant="h4" className="mb-1">{book.title}</Text>
-                            <Text variant="body" className="text-zinc-600 text-sm">by {book.author}</Text>
+                            <Text variant="h4" className="mb-1">
+                              {book.title}
+                            </Text>
+                            <Text
+                              variant="body"
+                              className="text-zinc-600 text-sm"
+                            >
+                              by {book.author}
+                            </Text>
                           </div>
                           <Badge variant="success">Available</Badge>
                         </div>
-                        
+
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center gap-2">
-                            <Badge variant="default" className="text-xs">{book.genre}</Badge>
-                            <Text variant="body" className="text-amber-600 font-semibold">{book.points} pts</Text>
+                            <Badge variant="default" className="text-xs">
+                              {book.genre}
+                            </Badge>
+                            <Text
+                              variant="body"
+                              className="text-amber-600 font-semibold"
+                            >
+                              {book.points} pts
+                            </Text>
                           </div>
                           <div className="flex items-center gap-2 text-zinc-600">
                             <MapPin className="w-4 h-4" />
                             <Text variant="caption">{book.location}</Text>
                           </div>
-                          <Text variant="caption" className="text-zinc-600">Owner: {book.owner}</Text>
+                          <Text variant="caption" className="text-zinc-600">
+                            Owner: {book.owner}
+                          </Text>
                         </div>
 
                         <div className="flex gap-2">
-                          <Button variant="primary" size="sm" className="flex-1">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="flex-1"
+                          >
                             Request Now
                           </Button>
                           <Button variant="outline" size="sm">
                             <MessageCircle className="w-4 h-4" />
                           </Button>
-                          <Button variant="outline" size="sm" onClick={() => removeFromWishlist(book.id)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFromWishlist(book.id)}
+                          >
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </Button>
                         </div>
@@ -195,7 +225,9 @@ export default function Wishlist() {
         {/* Unavailable Books */}
         {unavailableBooks.length > 0 && (
           <div>
-            <Text variant="h3" className="mb-4">Waiting for Availability ({unavailableBooks.length})</Text>
+            <Text variant="h3" className="mb-4">
+              Waiting for Availability ({unavailableBooks.length})
+            </Text>
             <div className="space-y-4">
               {unavailableBooks.map((book) => (
                 <Card key={book.id}>
@@ -207,14 +239,23 @@ export default function Wishlist() {
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <Text variant="h4" className="mb-1">{book.title}</Text>
-                            <Text variant="body" className="text-zinc-600 text-sm">by {book.author}</Text>
+                            <Text variant="h4" className="mb-1">
+                              {book.title}
+                            </Text>
+                            <Text
+                              variant="body"
+                              className="text-zinc-600 text-sm"
+                            >
+                              by {book.author}
+                            </Text>
                           </div>
                           <Badge variant="default">Unavailable</Badge>
                         </div>
-                        
+
                         <div className="flex items-center gap-4 mb-3">
-                          <Badge variant="default" className="text-xs">{book.genre}</Badge>
+                          <Badge variant="default" className="text-xs">
+                            {book.genre}
+                          </Badge>
                           <Text variant="caption" className="text-zinc-600">
                             {book.waitlistCount} people waiting
                           </Text>
@@ -229,8 +270,8 @@ export default function Wishlist() {
                               onClick={() => toggleAlert(book.id)}
                               variant="ghost"
                               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
-                                book.alertsEnabled 
-                                  ? "bg-primary/10 text-primary" 
+                                book.alertsEnabled
+                                  ? "bg-primary/10 text-primary"
                                   : "bg-zinc-100 text-zinc-600"
                               }`}
                             >
@@ -247,7 +288,11 @@ export default function Wishlist() {
                               )}
                             </Button>
                           </div>
-                          <Button variant="ghost" size="sm" onClick={() => removeFromWishlist(book.id)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFromWishlist(book.id)}
+                          >
                             <Trash2 className="w-4 h-4 mr-1 text-red-500" />
                             Remove
                           </Button>
@@ -264,15 +309,15 @@ export default function Wishlist() {
         {/* Empty State */}
         {wishlist.length === 0 && (
           <Card>
-            <CardContent className="py-12 text-center">
+            <CardContent className="py-8 sm:py-12 text-center">
               <Heart className="w-16 h-16 text-zinc-400 mx-auto mb-4" />
-              <Text variant="h3" className="mb-2">Your wishlist is empty</Text>
+              <Text variant="h3" className="mb-2">
+                Your wishlist is empty
+              </Text>
               <Text variant="body" className="text-zinc-600 mb-4">
                 Start adding books you're interested in to your wishlist
               </Text>
-              <Button variant="primary">
-                Browse Marketplace
-              </Button>
+              <Button variant="primary">Browse Marketplace</Button>
             </CardContent>
           </Card>
         )}

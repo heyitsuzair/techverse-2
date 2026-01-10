@@ -77,7 +77,7 @@ export default function MapView({ stalls, selectedStall, onSelectStall }) {
   if (loadError) {
     return (
       <div className="relative w-full h-full min-h-[600px] bg-slate-100 rounded-lg overflow-hidden shadow-lg flex items-center justify-center">
-        <div className="text-center p-8">
+        <div className="text-center p-6 sm:p-8">
           <MapPin className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-slate-900 mb-2">
             Failed to Load Map

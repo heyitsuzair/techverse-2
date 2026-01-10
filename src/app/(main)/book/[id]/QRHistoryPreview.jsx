@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { History, MapPin, Star, Calendar } from "lucide-react";
+import { History, MapPin, Star, Calendar, Eye } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -74,10 +74,11 @@ export default function QRHistoryPreview({ history = [], onViewFull }) {
 
           <Button
             variant="outline"
-            className="w-full mt-6 shadow-md hover:shadow-lg transition-all"
+            className="w-full mt-6 shadow-md hover:shadow-lg transition-all cursor-pointer"
             onClick={onViewFull}
           >
-            View Full History & Add Your Story →
+            <Eye className="w-4 h-4 mr-2" />
+            View Full History & Add Your Story
           </Button>
         </CardContent>
       </Card>

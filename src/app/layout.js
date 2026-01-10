@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased`}>
         <Providers>
-          <CustomCursor />
+          {/* <CustomCursor /> */}
           {children}
         </Providers>
       </body>

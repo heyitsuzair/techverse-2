@@ -24,7 +24,7 @@ export default function LoginModal({ isOpen, onClose, onLogin, onSignup }) {
           onClick={(e) => e.stopPropagation()}
         >
           <Card className="max-w-md w-full shadow-2xl border-border bg-card">
-            <CardContent className="p-8 text-center relative">
+            <CardContent className="p-6 sm:p-8 text-center relative">
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

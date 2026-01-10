@@ -123,7 +123,7 @@ export default function FeaturedBooks() {
                     </Badge>
                   </div>
                 </div>
-                <CardContent className="p-4">
+                <CardContent className="p-4 sm:p-5">
                   <h4 className="font-bold text-card-foreground mb-1 line-clamp-1">
                     {book.title}
                   </h4>

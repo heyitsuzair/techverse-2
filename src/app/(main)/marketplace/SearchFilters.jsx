@@ -38,9 +38,9 @@ export default function SearchFilters({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-card rounded-2xl shadow-lg border border-border p-6 mb-8"
+      className="bg-card rounded-2xl shadow-lg border border-border p-4 sm:p-6 mb-8"
     >
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <SlidersHorizontal className="w-5 h-5 text-primary" />
         <h3 className="text-lg font-semibold text-card-foreground">
           Search & Filters

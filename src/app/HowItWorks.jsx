@@ -95,7 +95,7 @@ export default function HowItWorks() {
                   {/* Decorative gradient on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 transition-all duration-300 z-0"></div>
 
-                  <CardContent className="relative p-6 md:p-8">
+                  <CardContent className="relative p-5 sm:p-6 md:p-8">
                     {/* Icon */}
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
