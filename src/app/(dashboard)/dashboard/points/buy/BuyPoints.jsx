@@ -22,6 +22,7 @@ import {
 import { getPackages, createCheckoutSession } from '@/lib/api/payments';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { getFromCookie } from '@/utils/cookies';
 
 export default function BuyPoints() {
   const { user } = useAuth();
@@ -53,7 +54,15 @@ export default function BuyPoints() {
     try {
       setPurchasingPackageId(pkg.id);
       
-      const data = await createCheckoutSession(pkg.id);
+      // Get access token from cookies
+      const accessToken = getFromCookie('accessToken');
+      if (!accessToken) {
+        toast.error('Please sign in to purchase packages');
+        setPurchasingPackageId(null);
+        return;
+      }
+      
+      const data = await createCheckoutSession(pkg.id, accessToken);
       
       // Redirect to Stripe checkout
       if (data.sessionUrl) {
@@ -64,7 +73,7 @@ export default function BuyPoints() {
       }
     } catch (error) {
       console.error('Failed to create checkout session:', error);
-      toast.error(error.response?.data?.error || 'Failed to start checkout');
+      toast.error(error.message || 'Failed to start checkout');
       setPurchasingPackageId(null);
     }
   };

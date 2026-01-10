@@ -9,8 +9,12 @@ import {
   Text,
   Badge,
   LinkWithProgress,
+  Spinner,
 } from "@/components/ui";
 import routes from "@/config/routes";
+import { getBookById, deleteBook } from "@/lib/api/books";
+import { getFromCookie } from "@/utils/cookies";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   BookOpen,
@@ -25,110 +29,6 @@ import {
   MessageSquare,
 } from "lucide-react";
 import DeleteBookModal from "../../DeleteBookModal";
-
-// Mock data - Replace with actual API call
-const MOCK_BOOKS = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    genre: "Fiction",
-    condition: "Excellent",
-    status: "Available",
-    requests: 3,
-    addedDate: "2025-12-01",
-    location: "New York, NY",
-    description:
-      "Set in the Jazz Age on Long Island, this novel tells the story of Jay Gatsby, a mysterious millionaire who throws extravagant parties in hopes of reuniting with his lost love, Daisy Buchanan. Through the eyes of narrator Nick Carraway, we witness the tragic tale of obsession, wealth, and the American Dream. Fitzgerald's masterpiece captures the essence of the Roaring Twenties with its vivid portrayal of excess, moral decay, and impossible dreams.",
-    isbn: "978-0743273565",
-    publishYear: "1925",
-    language: "English",
-    pages: 180,
-    publisher: "Scribner",
-    coverImage:
-      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop",
-  },
-  {
-    id: 2,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    genre: "Fiction",
-    condition: "Good",
-    status: "Available",
-    requests: 5,
-    addedDate: "2025-11-20",
-    location: "New York, NY",
-    description:
-      "This Pulitzer Prize-winning novel is narrated by Scout Finch, a young girl growing up in the fictional town of Maycomb, Alabama, during the Great Depression. Her father, Atticus Finch, a principled lawyer, defends a black man falsely accused of rape, exposing the deep-seated racism and prejudice of the American South. Through Scout's innocent eyes, we learn powerful lessons about morality, compassion, and courage in the face of injustice.",
-    isbn: "978-0061120084",
-    publishYear: "1960",
-    language: "English",
-    pages: 324,
-    publisher: "J.B. Lippincott & Co.",
-    coverImage:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
-  },
-  {
-    id: 3,
-    title: "1984",
-    author: "George Orwell",
-    genre: "Dystopian",
-    condition: "Like New",
-    status: "Available",
-    requests: 7,
-    addedDate: "2025-11-15",
-    location: "Los Angeles, CA",
-    description:
-      "In a totalitarian future society ruled by the Party and its leader Big Brother, Winston Smith works at the Ministry of Truth, rewriting history to fit the Party's narrative. As he begins to question the oppressive regime and falls in love with Julia, Winston risks everything for freedom and truth. Orwell's chilling dystopian masterpiece explores themes of surveillance, propaganda, and the manipulation of truth.",
-    isbn: "978-0451524935",
-    publishYear: "1949",
-    language: "English",
-    pages: 328,
-    publisher: "Signet Classic",
-    coverImage:
-      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=600&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    genre: "Romance",
-    condition: "Good",
-    status: "Available",
-    requests: 4,
-    addedDate: "2025-10-28",
-    location: "Boston, MA",
-    description:
-      "Elizabeth Bennet, a witty and independent young woman, navigates the complex social landscape of Regency-era England. When she meets the wealthy but seemingly arrogant Mr. Darcy, their initial mutual dislike slowly transforms into deep affection. Austen's beloved novel is a timeless exploration of love, class, reputation, and the importance of looking beyond first impressions.",
-    isbn: "978-0141439518",
-    publishYear: "1813",
-    language: "English",
-    pages: 432,
-    publisher: "Penguin Classics",
-    coverImage:
-      "https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400&h=600&fit=crop",
-  },
-  {
-    id: 5,
-    title: "The Hobbit",
-    author: "J.R.R. Tolkien",
-    genre: "Fantasy",
-    condition: "Excellent",
-    status: "Available",
-    requests: 8,
-    addedDate: "2025-10-10",
-    location: "Seattle, WA",
-    description:
-      "Bilbo Baggins, a comfort-loving hobbit, is swept into an epic quest to reclaim the lost Dwarf Kingdom of Erebor from the fearsome dragon Smaug. Accompanied by the wizard Gandalf and thirteen dwarves, Bilbo embarks on a journey filled with trolls, goblins, giant spiders, and a mysterious creature named Gollum. This enchanting tale of adventure and self-discovery is the beloved prelude to The Lord of the Rings.",
-    isbn: "978-0547928227",
-    publishYear: "1937",
-    language: "English",
-    pages: 366,
-    publisher: "Houghton Mifflin Harcourt",
-    coverImage:
-      "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=600&fit=crop",
-  },
-];
 
 export default function ViewBook({ params }) {
   const router = useRouter();
@@ -149,14 +49,20 @@ export default function ViewBook({ params }) {
   useEffect(() => {
     if (!bookId) return;
 
-    // Simulate API call
+    // Fetch book from API
     const fetchBook = async () => {
       try {
-        // Replace with actual API call
-        const foundBook = MOCK_BOOKS.find((b) => b.id === parseInt(bookId));
-        setBook(foundBook || null);
+        const response = await getBookById(bookId);
+        if (response.success && response.book) {
+          setBook(response.book);
+        } else {
+          setBook(null);
+          toast.error("Book not found");
+        }
       } catch (error) {
         console.error("Error fetching book:", error);
+        toast.error(error.message || "Failed to load book");
+        setBook(null);
       } finally {
         setLoading(false);
       }
@@ -166,16 +72,29 @@ export default function ViewBook({ params }) {
   }, [bookId]);
 
   const handleDelete = async (bookIdToDelete) => {
-    // Implement delete logic here
-    console.log("Deleting book:", bookIdToDelete);
-    // After successful deletion, redirect to my-books page
-    router.push(routes.dashboard.books.myBooks);
+    try {
+      const accessToken = getFromCookie("accessToken");
+      
+      if (!accessToken) {
+        toast.error("Please login to delete books");
+        return;
+      }
+
+      await deleteBook(bookIdToDelete, accessToken);
+      toast.success("Book deleted successfully");
+      
+      // Redirect to my-books page after successful deletion
+      router.push(routes.dashboard.books.myBooks);
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      toast.error(error.message || "Failed to delete book");
+    }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -204,18 +123,8 @@ export default function ViewBook({ params }) {
     );
   }
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Available":
-        return "success";
-      case "Pending":
-      case "In Transit":
-        return "warning";
-      case "Exchanged":
-        return "primary";
-      default:
-        return "default";
-    }
+  const getStatusColor = (isAvailable) => {
+    return isAvailable ? "success" : "default";
   };
 
   return (
@@ -240,8 +149,8 @@ export default function ViewBook({ params }) {
                   by {book.author}
                 </Text>
               </div>
-              <Badge variant={getStatusColor(book.status)} className="text-sm">
-                {book.status}
+              <Badge variant={getStatusColor(book.isAvailable)} className="text-sm">
+                {book.isAvailable ? "Available" : "Not Available"}
               </Badge>
             </div>
           </div>
@@ -296,51 +205,44 @@ export default function ViewBook({ params }) {
                             {book.condition}
                           </Text>
                         </div>
+                        {book.isbn && (
+                          <div>
+                            <Text
+                              variant="caption"
+                              className="text-zinc-500 mb-1"
+                            >
+                              ISBN
+                            </Text>
+                            <Text
+                              variant="caption"
+                              className="font-mono text-zinc-700"
+                            >
+                              {book.isbn}
+                            </Text>
+                          </div>
+                        )}
+                        {book.pointValue && (
+                          <div>
+                            <Text
+                              variant="caption"
+                              className="text-zinc-500 mb-1"
+                            >
+                              Point Value
+                            </Text>
+                            <Text variant="body" className="font-medium text-primary">
+                              {book.pointValue} points
+                            </Text>
+                          </div>
+                        )}
                         <div>
                           <Text
                             variant="caption"
                             className="text-zinc-500 mb-1"
                           >
-                            Published
+                            Added On
                           </Text>
-                          <Text variant="body" className="font-medium">
-                            {book.publishYear}
-                          </Text>
-                        </div>
-                        <div>
-                          <Text
-                            variant="caption"
-                            className="text-zinc-500 mb-1"
-                          >
-                            Pages
-                          </Text>
-                          <Text variant="body" className="font-medium">
-                            {book.pages}
-                          </Text>
-                        </div>
-                        <div>
-                          <Text
-                            variant="caption"
-                            className="text-zinc-500 mb-1"
-                          >
-                            Language
-                          </Text>
-                          <Text variant="body" className="font-medium">
-                            {book.language}
-                          </Text>
-                        </div>
-                        <div>
-                          <Text
-                            variant="caption"
-                            className="text-zinc-500 mb-1"
-                          >
-                            ISBN
-                          </Text>
-                          <Text
-                            variant="caption"
-                            className="font-mono text-zinc-700"
-                          >
-                            {book.isbn}
+                          <Text variant="caption" className="text-zinc-700">
+                            {new Date(book.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                           </Text>
                         </div>
                       </div>
@@ -365,38 +267,26 @@ export default function ViewBook({ params }) {
                 </CardContent>
               </Card>
 
-              {/* Publisher Info */}
-              <Card>
-                <CardContent className="pt-6">
-                  <Text variant="h4" className="mb-4">
-                    Publication Details
-                  </Text>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Package className="w-5 h-5 text-zinc-500" />
-                      <div>
-                        <Text variant="caption" className="text-zinc-500">
-                          Publisher
-                        </Text>
-                        <Text variant="body" className="font-medium">
-                          {book.publisher}
-                        </Text>
-                      </div>
+              {/* QR Code */}
+              {book.qrCodeUrl && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <Text variant="h4" className="mb-4">
+                      QR Code
+                    </Text>
+                    <div className="flex justify-center">
+                      <img 
+                        src={book.qrCodeUrl} 
+                        alt="Book QR Code"
+                        className="w-48 h-48 object-contain"
+                      />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-zinc-500" />
-                      <div>
-                        <Text variant="caption" className="text-zinc-500">
-                          Publication Year
-                        </Text>
-                        <Text variant="body" className="font-medium">
-                          {book.publishYear}
-                        </Text>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    <Text variant="caption" className="text-center text-zinc-600 mt-3 block">
+                      Scan to view book details
+                    </Text>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -442,9 +332,9 @@ export default function ViewBook({ params }) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <MessageSquare className="w-5 h-5 text-zinc-500" />
-                        <Text variant="body">Exchange Requests</Text>
+                        <Text variant="body">Exchanges</Text>
                       </div>
-                      <Badge variant="primary">{book.requests}</Badge>
+                      <Badge variant="primary">{book._count?.exchanges || 0}</Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -452,25 +342,36 @@ export default function ViewBook({ params }) {
                         <Text variant="body">Added Date</Text>
                       </div>
                       <Text variant="caption" className="text-zinc-600">
-                        {book.addedDate}
+                        {new Date(book.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </Text>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-zinc-500" />
+                        <Text variant="body">Status</Text>
+                      </div>
+                      <Badge variant={book.isAvailable ? "success" : "default"}>
+                        {book.isAvailable ? "Available" : "Not Available"}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Location Card */}
-              <Card>
-                <CardContent className="pt-6">
-                  <Text variant="h4" className="mb-4 flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Location
-                  </Text>
-                  <Text variant="body" className="text-zinc-700">
-                    {book.location}
-                  </Text>
-                </CardContent>
-              </Card>
+              {book.locationAddress && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <Text variant="h4" className="mb-4 flex items-center gap-2">
+                      <MapPin className="w-5 h-5" />
+                      Location
+                    </Text>
+                    <Text variant="body" className="text-zinc-700">
+                      {book.locationAddress}
+                    </Text>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>

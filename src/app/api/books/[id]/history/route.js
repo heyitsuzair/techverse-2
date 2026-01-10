@@ -9,7 +9,7 @@ import { validateAuthHeader } from "@/lib/auth/token-utils";
  */
 export async function POST(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -115,7 +115,7 @@ export async function POST(request, { params }) {
  */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(

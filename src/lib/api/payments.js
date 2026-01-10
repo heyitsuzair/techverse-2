@@ -13,6 +13,7 @@ import { getFromCookie } from "@/utils/cookies";
 export const getPackages = async () => {
   const token =
     typeof window !== "undefined" ? getFromCookie("accessToken") : null;
+
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
   return get(endpoints.payments.packages, headers);

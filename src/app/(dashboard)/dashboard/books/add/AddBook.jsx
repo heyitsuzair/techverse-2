@@ -14,6 +14,7 @@ import {
   Badge,
   Radio
 } from "@/components/ui";
+import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
 import { 
   BookOpen,
   Upload,
@@ -23,21 +24,49 @@ import {
   Image as ImageIcon,
   X
 } from "lucide-react";
+import { createBook } from '@/lib/api/books';
+import { getFromCookie } from '@/utils/cookies';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import routes from '@/config/routes';
 
-// Mock Data
+// Book Genres
 const BOOK_GENRES = [
-  "Fiction",
-  "Non-Fiction",
-  "Mystery",
-  "Romance",
+  "Classic Fiction",
+  "Contemporary Fiction",
+  "Literary Fiction",
   "Science Fiction",
   "Fantasy",
+  "Mystery",
+  "Thriller",
+  "Horror",
+  "Romance",
+  "Historical Fiction",
+  "Dystopian",
+  "Adventure",
+  "Young Adult",
+  "Children's Books",
+  "Non-Fiction",
   "Biography",
+  "Autobiography",
+  "Memoir",
   "History",
   "Self-Help",
-  "Children's Books",
+  "Business",
+  "Psychology",
+  "Philosophy",
+  "Religion",
+  "Science",
+  "Technology",
+  "Travel",
+  "Cooking",
+  "Art",
   "Poetry",
-  "Thriller"
+  "Drama",
+  "Comics",
+  "Graphic Novels",
+  "Education",
+  "Health & Wellness"
 ];
 
 const BOOK_CONDITIONS = [
@@ -49,6 +78,7 @@ const BOOK_CONDITIONS = [
 ];
 
 export default function AddBook() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     title: "",
@@ -57,32 +87,82 @@ export default function AddBook() {
     genre: "",
     condition: "",
     description: "",
-    location: "",
-    images: []
+    locationAddress: "",
+    locationLat: null,
+    locationLng: null,
+    images: [] // Will store { file: File, preview: string }
   });
-  const [generatedQR, setGeneratedQR] = useState(false);
+  const [createdBook, setCreatedBook] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
   };
 
   const handleImageUpload = (e) => {
-    // Mock image upload
     const files = Array.from(e.target.files || []);
-    setFormData({ ...formData, images: [...formData.images, ...files.map(f => f.name)] });
+    const newImages = files.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+    setFormData({ ...formData, images: [...formData.images, ...newImages] });
   };
 
   const removeImage = (index) => {
+    const imageToRemove = formData.images[index];
+    // Revoke the object URL to free memory
+    URL.revokeObjectURL(imageToRemove.preview);
     const newImages = formData.images.filter((_, i) => i !== index);
     setFormData({ ...formData, images: newImages });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setGeneratedQR(true);
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Get access token
+      const accessToken = getFromCookie('accessToken');
+      if (!accessToken) {
+        toast.error('Please sign in to add a book');
+        return;
+      }
+      
+      // Prepare book data
+      const bookData = {
+        title: formData.title,
+        author: formData.author,
+        isbn: formData.isbn,
+        genre: formData.genre,
+        condition: formData.condition,
+        description: formData.description,
+        locationAddress: formData.locationAddress,
+        locationLat: formData.locationLat,
+        locationLng: formData.locationLng,
+      };
+      
+      // Add first image as cover image if available
+      if (formData.images.length > 0) {
+        bookData.coverImage = formData.images[0].file;
+      }
+      
+      // Call API
+      const response = await createBook(bookData, accessToken);
+      
+      if (response.success) {
+        setCreatedBook(response.book);
+        toast.success(response.message || 'Book added successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to create book:', error);
+      toast.error(error.message || 'Failed to add book');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (generatedQR) {
+  if (createdBook) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md w-full mx-4">
@@ -97,25 +177,68 @@ export default function AddBook() {
               </Text>
               
               <div className="bg-white border-2 border-zinc-200 rounded-lg p-6 mb-6">
-                <QrCode className="w-32 h-32 mx-auto text-zinc-400" />
-                <Text variant="caption" className="text-zinc-600 mt-4">
-                  QR Code Generated
+                {createdBook.qrCodeUrl ? (
+                  <img 
+                    src={createdBook.qrCodeUrl} 
+                    alt="QR Code"
+                    className="w-48 h-48 mx-auto object-contain"
+                  />
+                ) : (
+                  <QrCode className="w-32 h-32 mx-auto text-zinc-400" />
+                )}
+                <Text variant="caption" className="text-zinc-600 mt-4 block">
+                  {createdBook.qrCodeUrl ? 'QR Code Generated Successfully' : 'QR Code Generation Pending'}
                 </Text>
               </div>
 
               <div className="bg-zinc-50 rounded-lg p-4 mb-6 text-left">
-                <Text variant="caption" className="text-zinc-600 mb-2">Book Details</Text>
-                <Text variant="h4" className="mb-1">{formData.title}</Text>
-                <Text variant="body" className="text-zinc-600">by {formData.author}</Text>
-                <div className="flex gap-2 mt-3">
-                  <Badge variant="primary">{formData.genre}</Badge>
-                  <Badge variant="success">{formData.condition}</Badge>
+                <Text variant="caption" className="text-zinc-600 mb-3 block">Book Details</Text>
+                
+                {/* Cover Image */}
+                {createdBook.coverImage && (
+                  <div className="mb-4">
+                    <img 
+                      src={createdBook.coverImage} 
+                      alt={createdBook.title}
+                      className="w-32 h-48 object-cover rounded-lg mx-auto"
+                    />
+                  </div>
+                )}
+                
+                <Text variant="h4" className="mb-1">{createdBook.title}</Text>
+                <Text variant="body" className="text-zinc-600 mb-3">by {createdBook.author || 'Unknown Author'}</Text>
+                
+                <div className="space-y-2 mb-3">
+                  {createdBook.isbn && (
+                    <div className="flex justify-between">
+                      <Text variant="caption" className="text-zinc-600">ISBN:</Text>
+                      <Text variant="caption">{createdBook.isbn}</Text>
+                    </div>
+                  )}
+                  {createdBook.pointValue && (
+                    <div className="flex justify-between">
+                      <Text variant="caption" className="text-zinc-600">Point Value:</Text>
+                      <Text variant="caption" className="font-semibold text-primary">{createdBook.pointValue} points</Text>
+                    </div>
+                  )}
+                  {createdBook.locationAddress && (
+                    <div className="flex justify-between">
+                      <Text variant="caption" className="text-zinc-600">Location:</Text>
+                      <Text variant="caption">{createdBook.locationAddress}</Text>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex gap-2 flex-wrap">
+                  <Badge variant="primary">{createdBook.genre}</Badge>
+                  <Badge variant="success">{createdBook.condition}</Badge>
+                  {createdBook.isAvailable && <Badge>Available</Badge>}
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => {
-                  setGeneratedQR(false);
+                  setCreatedBook(null);
                   setFormData({
                     title: "",
                     author: "",
@@ -123,13 +246,20 @@ export default function AddBook() {
                     genre: "",
                     condition: "",
                     description: "",
-                    location: "",
+                    locationAddress: "",
+                    locationLat: null,
+                    locationLng: null,
                     images: []
                   });
+                  setStep(1);
                 }}>
                   Add Another Book
                 </Button>
-                <Button variant="primary" className="flex-1">
+                <Button 
+                  variant="primary" 
+                  className="flex-1"
+                  onClick={() => router.push(routes.dashboard.books.myBooks)}
+                >
                   View My Books
                 </Button>
               </div>
@@ -218,13 +348,13 @@ export default function AddBook() {
                       <Select
                         value={formData.genre}
                         onChange={(e) => handleChange("genre", e.target.value)}
+                        placeholder="Select genre"
+                        options={BOOK_GENRES.map(genre => ({
+                          value: genre,
+                          label: genre
+                        }))}
                         required
-                      >
-                        <option value="">Select genre</option>
-                        {BOOK_GENRES.map((genre) => (
-                          <option key={genre} value={genre}>{genre}</option>
-                        ))}
-                      </Select>
+                      />
                     </div>
                   </div>
 
@@ -299,11 +429,12 @@ export default function AddBook() {
                         className="hidden"
                         id="image-upload"
                       />
-                      <label htmlFor="image-upload">
-                        <Button type="button" variant="outline" as="span">
-                          <ImageIcon className="w-4 h-4 mr-2" />
-                          Select Images
-                        </Button>
+                      <label 
+                        htmlFor="image-upload"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer border-2 border-primary bg-transparent text-primary hover:bg-primary/10 focus:ring-primary h-10 px-4 text-base"
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        Select Images
                       </label>
                     </div>
                   </div>
@@ -313,19 +444,19 @@ export default function AddBook() {
                       <Text variant="caption" className="mb-3">Uploaded Images ({formData.images.length})</Text>
                       <div className="grid grid-cols-3 gap-4">
                         {formData.images.map((image, idx) => (
-                          <div key={idx} className="relative aspect-square bg-zinc-100 rounded-lg flex items-center justify-center group">
-                            <ImageIcon className="w-8 h-8 text-zinc-400" />
-                            <Button
+                          <div key={idx} className="relative aspect-square bg-zinc-100 rounded-lg overflow-hidden group">
+                            <img 
+                              src={image.preview} 
+                              alt={`Preview ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
                               type="button"
                               onClick={() => removeImage(idx)}
-                              variant="ghost"
-                              className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity p-0"
+                              className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                             >
                               <X className="w-4 h-4" />
-                            </Button>
-                            <Text variant="caption" className="absolute bottom-2 left-2 right-2 text-xs truncate">
-                              {image}
-                            </Text>
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -351,11 +482,17 @@ export default function AddBook() {
                       <MapPin className="w-4 h-4" />
                       Book Location *
                     </Text>
-                    <Input
-                      placeholder="Enter city or location"
-                      value={formData.location}
-                      onChange={(e) => handleChange("location", e.target.value)}
-                      required
+                    <AddressAutocomplete
+                      value={formData.locationAddress}
+                      onChange={(address, lat, lng) => {
+                        setFormData({
+                          ...formData,
+                          locationAddress: address,
+                          locationLat: lat,
+                          locationLng: lng
+                        });
+                      }}
+                      placeholder="Search for book location"
                     />
                     <Text variant="caption" className="text-zinc-600 mt-2">
                       This helps match you with nearby readers
@@ -392,9 +529,14 @@ export default function AddBook() {
                     <Button type="button" variant="outline" onClick={() => setStep(2)}>
                       Back
                     </Button>
-                    <Button type="submit" variant="primary">
+                    <Button 
+                      type="submit" 
+                      variant="primary"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                    >
                       <QrCode className="w-4 h-4 mr-2" />
-                      Generate QR & List Book
+                      {isSubmitting ? 'Creating...' : 'Generate QR & List Book'}
                     </Button>
                   </div>
                 </div>

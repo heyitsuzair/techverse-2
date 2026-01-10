@@ -13,8 +13,13 @@ import {
   LinkWithProgress,
   Alert,
   AlertDescription,
+  Spinner,
 } from "@/components/ui";
+import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
 import routes from "@/config/routes";
+import { getBookById, updateBook } from "@/lib/api/books";
+import { getFromCookie } from "@/utils/cookies";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   BookOpen,
@@ -28,136 +33,50 @@ import {
 } from "lucide-react";
 import DeleteImageModal from "./DeleteImageModal";
 
-// Mock data - Replace with actual API call
-const MOCK_BOOKS = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    genre: "Fiction",
-    condition: "Excellent",
-    status: "Available",
-    addedDate: "2025-12-01",
-    location: "New York, NY",
-    description:
-      "Set in the Jazz Age on Long Island, this novel tells the story of Jay Gatsby, a mysterious millionaire who throws extravagant parties in hopes of reuniting with his lost love, Daisy Buchanan. Through the eyes of narrator Nick Carraway, we witness the tragic tale of obsession, wealth, and the American Dream. Fitzgerald's masterpiece captures the essence of the Roaring Twenties with its vivid portrayal of excess, moral decay, and impossible dreams.",
-    isbn: "978-0743273565",
-    publishYear: "1925",
-    language: "English",
-    pages: 180,
-    publisher: "Scribner",
-    coverImage:
-      "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop",
-  },
-  {
-    id: 2,
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    genre: "Fiction",
-    condition: "Good",
-    status: "Available",
-    addedDate: "2025-11-20",
-    location: "New York, NY",
-    description:
-      "This Pulitzer Prize-winning novel is narrated by Scout Finch, a young girl growing up in the fictional town of Maycomb, Alabama, during the Great Depression. Her father, Atticus Finch, a principled lawyer, defends a black man falsely accused of rape, exposing the deep-seated racism and prejudice of the American South. Through Scout's innocent eyes, we learn powerful lessons about morality, compassion, and courage in the face of injustice.",
-    isbn: "978-0061120084",
-    publishYear: "1960",
-    language: "English",
-    pages: 324,
-    publisher: "J.B. Lippincott & Co.",
-    coverImage:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
-  },
-  {
-    id: 3,
-    title: "1984",
-    author: "George Orwell",
-    genre: "Dystopian",
-    condition: "Like New",
-    status: "Available",
-    addedDate: "2025-11-15",
-    location: "Los Angeles, CA",
-    description:
-      "In a totalitarian future society ruled by the Party and its leader Big Brother, Winston Smith works at the Ministry of Truth, rewriting history to fit the Party's narrative. As he begins to question the oppressive regime and falls in love with Julia, Winston risks everything for freedom and truth. Orwell's chilling dystopian masterpiece explores themes of surveillance, propaganda, and the manipulation of truth.",
-    isbn: "978-0451524935",
-    publishYear: "1949",
-    language: "English",
-    pages: 328,
-    publisher: "Signet Classic",
-    coverImage:
-      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=600&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    genre: "Romance",
-    condition: "Good",
-    status: "Available",
-    addedDate: "2025-10-28",
-    location: "Boston, MA",
-    description:
-      "Elizabeth Bennet, a witty and independent young woman, navigates the complex social landscape of Regency-era England. When she meets the wealthy but seemingly arrogant Mr. Darcy, their initial mutual dislike slowly transforms into deep affection. Austen's beloved novel is a timeless exploration of love, class, reputation, and the importance of looking beyond first impressions.",
-    isbn: "978-0141439518",
-    publishYear: "1813",
-    language: "English",
-    pages: 432,
-    publisher: "Penguin Classics",
-    coverImage:
-      "https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400&h=600&fit=crop",
-  },
-  {
-    id: 5,
-    title: "The Hobbit",
-    author: "J.R.R. Tolkien",
-    genre: "Fantasy",
-    condition: "Excellent",
-    status: "Available",
-    addedDate: "2025-10-10",
-    location: "Seattle, WA",
-    description:
-      "Bilbo Baggins, a comfort-loving hobbit, is swept into an epic quest to reclaim the lost Dwarf Kingdom of Erebor from the fearsome dragon Smaug. Accompanied by the wizard Gandalf and thirteen dwarves, Bilbo embarks on a journey filled with trolls, goblins, giant spiders, and a mysterious creature named Gollum. This enchanting tale of adventure and self-discovery is the beloved prelude to The Lord of the Rings.",
-    isbn: "978-0547928227",
-    publishYear: "1937",
-    language: "English",
-    pages: 366,
-    publisher: "Houghton Mifflin Harcourt",
-    coverImage:
-      "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=600&fit=crop",
-  },
+const BOOK_GENRES = [
+  "Classic Fiction",
+  "Contemporary Fiction",
+  "Literary Fiction",
+  "Science Fiction",
+  "Fantasy",
+  "Mystery",
+  "Thriller",
+  "Horror",
+  "Romance",
+  "Historical Fiction",
+  "Dystopian",
+  "Adventure",
+  "Young Adult",
+  "Children's Books",
+  "Non-Fiction",
+  "Biography",
+  "Autobiography",
+  "Memoir",
+  "History",
+  "Self-Help",
+  "Business",
+  "Psychology",
+  "Philosophy",
+  "Religion",
+  "Science",
+  "Technology",
+  "Travel",
+  "Cooking",
+  "Art",
+  "Poetry",
+  "Drama",
+  "Comics",
+  "Graphic Novels",
+  "Education",
+  "Health & Wellness"
 ];
 
-const GENRE_OPTIONS = [
-  { value: "Fiction", label: "Fiction" },
-  { value: "Non-Fiction", label: "Non-Fiction" },
-  { value: "Science Fiction", label: "Science Fiction" },
-  { value: "Fantasy", label: "Fantasy" },
-  { value: "Mystery", label: "Mystery" },
-  { value: "Thriller", label: "Thriller" },
-  { value: "Romance", label: "Romance" },
-  { value: "Horror", label: "Horror" },
-  { value: "Biography", label: "Biography" },
-  { value: "History", label: "History" },
-  { value: "Self-Help", label: "Self-Help" },
-  { value: "Other", label: "Other" },
-];
-
-const CONDITION_OPTIONS = [
-  { value: "Like New", label: "Like New" },
-  { value: "Excellent", label: "Excellent" },
-  { value: "Good", label: "Good" },
-  { value: "Fair", label: "Fair" },
-  { value: "Poor", label: "Poor" },
-];
-
-const LANGUAGE_OPTIONS = [
-  { value: "English", label: "English" },
-  { value: "Spanish", label: "Spanish" },
-  { value: "French", label: "French" },
-  { value: "German", label: "German" },
-  { value: "Italian", label: "Italian" },
-  { value: "Portuguese", label: "Portuguese" },
-  { value: "Other", label: "Other" },
+const BOOK_CONDITIONS = [
+  { value: "new", label: "Like New", description: "Perfect condition, no wear" },
+  { value: "excellent", label: "Excellent", description: "Minor signs of use" },
+  { value: "good", label: "Good", description: "Used but well maintained" },
+  { value: "fair", label: "Fair", description: "Visible wear but fully readable" },
+  { value: "poor", label: "Poor", description: "Significant wear, pages intact" }
 ];
 
 export default function EditBook({ params }) {
@@ -178,11 +97,9 @@ export default function EditBook({ params }) {
     condition: "",
     description: "",
     isbn: "",
-    publishYear: "",
-    language: "",
-    pages: "",
-    publisher: "",
-    location: "",
+    locationAddress: "",
+    locationLat: null,
+    locationLng: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -200,33 +117,33 @@ export default function EditBook({ params }) {
   useEffect(() => {
     if (!bookId) return;
 
-    // Simulate API call to fetch book data
     const fetchBook = async () => {
       try {
-        const book = MOCK_BOOKS.find((b) => b.id === parseInt(bookId));
-        if (book) {
+        const response = await getBookById(bookId);
+        if (response.success && response.book) {
+          const book = response.book;
           setFormData({
-            title: book.title,
-            author: book.author,
-            genre: book.genre,
-            condition: book.condition,
-            description: book.description,
-            isbn: book.isbn,
-            publishYear: book.publishYear,
-            language: book.language,
-            pages: book.pages.toString(),
-            publisher: book.publisher,
-            location: book.location,
+            title: book.title || "",
+            author: book.author || "",
+            genre: book.genre || "",
+            condition: book.condition || "",
+            description: book.description || "",
+            isbn: book.isbn || "",
+            locationAddress: book.locationAddress || "",
+            locationLat: book.locationLat || null,
+            locationLng: book.locationLng || null,
           });
-          // Set the cover image if it exists
           if (book.coverImage) {
             setImagePreview(book.coverImage);
           }
         } else {
           setError("Book not found");
+          toast.error("Book not found");
         }
       } catch (err) {
+        console.error("Failed to load book:", err);
         setError("Failed to load book data");
+        toast.error(err.message || "Failed to load book data");
       } finally {
         setLoading(false);
       }
@@ -299,14 +216,6 @@ export default function EditBook({ params }) {
       newErrors.condition = "Condition is required";
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
-    }
-
-    if (formData.pages && isNaN(parseInt(formData.pages))) {
-      newErrors.pages = "Pages must be a number";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -322,19 +231,43 @@ export default function EditBook({ params }) {
     setError("");
 
     try {
-      // Simulate API call to update book
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const accessToken = getFromCookie("accessToken");
+      if (!accessToken) {
+        toast.error("Please sign in to update book");
+        setSaving(false);
+        return;
+      }
 
-      console.log("Updating book:", bookId, formData);
+      const bookData = {
+        title: formData.title,
+        author: formData.author,
+        genre: formData.genre,
+        condition: formData.condition,
+        description: formData.description || "",
+        isbn: formData.isbn || "",
+        locationAddress: formData.locationAddress || "",
+        locationLat: formData.locationLat || null,
+        locationLng: formData.locationLng || null,
+      };
 
-      setSuccess(true);
+      if (bookImage) {
+        bookData.coverImage = bookImage;
+      }
 
-      // Redirect after a short delay
-      setTimeout(() => {
-        router.push(routes.dashboard.books.view(bookId));
-      }, 1500);
+      const response = await updateBook(bookId, bookData, accessToken);
+
+      if (response.success) {
+        setSuccess(true);
+        toast.success(response.message || "Book updated successfully!");
+        
+        setTimeout(() => {
+          router.push(routes.dashboard.books.view(bookId));
+        }, 1500);
+      }
     } catch (err) {
-      setError("Failed to update book. Please try again.");
+      console.error("Failed to update book:", err);
+      setError(err.message || "Failed to update book. Please try again.");
+      toast.error(err.message || "Failed to update book");
       setSaving(false);
     }
   };
@@ -342,7 +275,7 @@ export default function EditBook({ params }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -644,73 +577,29 @@ export default function EditBook({ params }) {
                         placeholder="978-0000000000"
                       />
                     </div>
+                  </div>
 
-                    <div>
-                      <label htmlFor="publishYear" className="block mb-2">
-                        <Text variant="body" className="font-medium">
-                          Publication Year
-                        </Text>
-                      </label>
-                      <Input
-                        id="publishYear"
-                        name="publishYear"
-                        value={formData.publishYear}
-                        onChange={handleChange}
-                        placeholder="2024"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="publisher" className="block mb-2">
-                        <Text variant="body" className="font-medium">
-                          Publisher
-                        </Text>
-                      </label>
-                      <Input
-                        id="publisher"
-                        name="publisher"
-                        value={formData.publisher}
-                        onChange={handleChange}
-                        placeholder="Enter publisher name"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="language" className="block mb-2">
-                        <Text variant="body" className="font-medium">
-                          Language
-                        </Text>
-                      </label>
-                      <Select
-                        id="language"
-                        name="language"
-                        value={formData.language}
-                        onChange={handleChange}
-                        options={LANGUAGE_OPTIONS}
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="pages" className="block mb-2">
-                        <Text variant="body" className="font-medium">
-                          Number of Pages
-                        </Text>
-                      </label>
-                      <Input
-                        id="pages"
-                        name="pages"
-                        type="number"
-                        value={formData.pages}
-                        onChange={handleChange}
-                        placeholder="300"
-                        error={errors.pages}
-                      />
-                      {errors.pages && (
-                        <Text variant="caption" className="text-red-600 mt-1">
-                          {errors.pages}
-                        </Text>
-                      )}
-                    </div>
+                  {/* Location Field */}
+                  <div>
+                    <Text variant="caption" className="mb-2 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Book Location
+                    </Text>
+                    <AddressAutocomplete
+                      value={formData.locationAddress}
+                      onChange={(address, lat, lng) => {
+                        setFormData({
+                          ...formData,
+                          locationAddress: address,
+                          locationLat: lat,
+                          locationLng: lng
+                        });
+                      }}
+                      placeholder="Search for book location"
+                    />
+                    <Text variant="caption" className="text-zinc-600 mt-2">
+                      This helps match you with nearby readers
+                    </Text>
                   </div>
                 </div>
 
