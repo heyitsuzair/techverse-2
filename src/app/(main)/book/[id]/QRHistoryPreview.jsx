@@ -78,7 +78,8 @@ export default function QRHistoryPreview({ history = [], onViewFull }) {
             onClick={onViewFull}
           >
             <Eye className="w-4 h-4 mr-2" />
-            View Full History & Add Your Story
+            <span className="text-sm md:text-base"> View Full History & Add Your Story</span>
+           
           </Button>
         </CardContent>
       </Card>
