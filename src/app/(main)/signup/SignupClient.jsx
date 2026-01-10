@@ -15,6 +15,7 @@ import {
 import { Button, Input, Card, CardContent, Checkbox } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import { setInLocalStorage } from "@/utils/localStorage";
 
 export default function SignupClient() {
   const router = useRouterWithProgress();
@@ -29,13 +30,14 @@ export default function SignupClient() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: "" });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validation
@@ -53,9 +55,47 @@ export default function SignupClient() {
       return;
     }
 
-    // Mock: Navigate to dashboard
-    console.log("Sign up:", formData);
-    alert("This is a frontend demo. No actual registration is performed.");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrors({ general: data.error || "Registration failed" });
+        setIsLoading(false);
+        return;
+      }
+
+      // Store user data and tokens in localStorage
+      setInLocalStorage("techverse", {
+        user: data.user,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+
+      // Trigger storage event for other components to update
+      window.dispatchEvent(new Event("storage"));
+
+      // Redirect to dashboard
+      router.push(routes.dashboard.index);
+    } catch (error) {
+      console.error("Sign up error:", error);
+      setErrors({ general: "An error occurred. Please try again." });
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -98,6 +138,13 @@ export default function SignupClient() {
           <Card className="border-slate-200 shadow-2xl">
             <CardContent className="p-6 sm:p-8">
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* General Error */}
+                {errors.general && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{errors.general}</p>
+                  </div>
+                )}
+
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -272,9 +319,14 @@ export default function SignupClient() {
                 </div>
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full" size="lg">
-                  Create Account
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                  {!isLoading && <ArrowRight className="w-5 h-5 ml-2" />}
                 </Button>
               </form>
 

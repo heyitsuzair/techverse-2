@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Menu, X } from "lucide-react";
+import { BookOpen, Menu, X, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import { getFromLocalStorage } from "@/utils/localStorage";
 
 const NAV_LINKS = [
   { label: "Marketplace", href: routes.marketplace },
@@ -17,6 +18,25 @@ const NAV_LINKS = [
 export default function Navigation() {
   const router = useRouterWithProgress();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const checkAuth = () => {
+      const userData = getFromLocalStorage("techverse");
+      if (userData && userData.accessToken) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+
+    // Listen for storage changes (e.g., when user logs in/out in another tab)
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
 
   return (
     <nav className="border-b border-border bg-card/90 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
@@ -53,19 +73,31 @@ export default function Navigation() {
 
           {/* Auth Buttons - Desktop Only */}
           <div className="hidden lg:flex items-center gap-2 sm:gap-3">
-            <Button
-              variant="ghost"
-              onClick={() => router.push(routes.auth.signin)}
-              className="text-sm md:text-base hover:bg-muted cursor-pointer"
-            >
-              Login
-            </Button>
-            <Button
-              onClick={() => router.push(routes.auth.signup)}
-              className="text-sm md:text-base bg-linear-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
-            >
-              Sign Up
-            </Button>
+            {isAuthenticated ? (
+              <Button
+                onClick={() => router.push(routes.dashboard.index)}
+                className="text-sm md:text-base bg-linear-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center gap-2"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push(routes.auth.signin)}
+                  className="text-sm md:text-base hover:bg-muted cursor-pointer"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => router.push(routes.auth.signup)}
+                  className="text-sm md:text-base bg-linear-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -108,24 +140,39 @@ export default function Navigation() {
 
                 {/* Auth Buttons in Mobile Menu */}
                 <div className="pt-2 mt-2 border-t border-border space-y-2">
-                  <button
-                    onClick={() => {
-                      router.push(routes.auth.signin);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 hover:bg-muted rounded-lg transition-colors text-foreground cursor-pointer"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => {
-                      router.push(routes.auth.signup);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 bg-linear-to-r from-primary to-secondary text-primary-foreground rounded-lg hover:shadow-lg transition-all cursor-pointer"
-                  >
-                    Sign Up
-                  </button>
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        router.push(routes.dashboard.index);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 bg-linear-to-r from-primary to-secondary text-primary-foreground rounded-lg hover:shadow-lg transition-all cursor-pointer flex items-center gap-2"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Dashboard
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          router.push(routes.auth.signin);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-muted rounded-lg transition-colors text-foreground cursor-pointer"
+                      >
+                        Login
+                      </button>
+                      <button
+                        onClick={() => {
+                          router.push(routes.auth.signup);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-3 bg-linear-to-r from-primary to-secondary text-primary-foreground rounded-lg hover:shadow-lg transition-all cursor-pointer"
+                      >
+                        Sign Up
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
