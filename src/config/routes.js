@@ -3,6 +3,7 @@ export default {
   auth: {
     signin: "/signin",
     signup: "/signup",
+    forgotPassword: "/forgot-password",
   },
   dashboard: {
     index: "/dashboard",
