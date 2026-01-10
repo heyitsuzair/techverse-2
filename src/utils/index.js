@@ -75,3 +75,7 @@ export {
   formatCreditCard,
   getInitials,
 } from "./format";
+
+// Cloudinary utilities
+export { uploadToCloudinary } from "./uploadToCloudinary";
+export { deleteFromCloudinary } from "./deleteFromCloudinary";
