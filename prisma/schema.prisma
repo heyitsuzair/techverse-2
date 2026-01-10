@@ -17,6 +17,12 @@ model User {
   phone        String?
   profileImage String?
   points       Int     @default(100)
+  bio          String?
+
+  // Location
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
 
   // OAuth
   googleId      String? @unique
@@ -26,6 +32,11 @@ model User {
   resetPasswordToken   String?
   resetPasswordExpires DateTime?
 
+  // Relations
+  books     Book[]
+  exchanges Exchange[]
+  payments  Payment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -33,3 +44,165 @@ model User {
   @@index([googleId])
 }
 
+model Book {
+  id          String  @id @default(uuid())
+  title       String
+  author      String?
+  isbn        String?
+  description String?
+  coverImage  String?
+  qrCodeUrl   String? // QR code image URL from Cloudinary
+  genre       String?
+  condition   String? // e.g., "new", "excellent", "good", "fair", "poor"
+  language    String? @default("English")
+  pointValue  Int     @default(10) // Points required for exchange
+
+  // Location
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
+
+  // Availability
+  isAvailable Boolean @default(true)
+
+  // Owner
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  exchanges   Exchange[]
+  bookHistory BookHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isbn])
+  @@index([isAvailable])
+  @@index([genre])
+}
+
+model BookHistory {
+  id     String  @id @default(uuid())
+  bookId String
+  book   Book    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId String
+  action String // "scanned", "noted", "exchanged", "read", "reviewed"
+  notes  String?
+
+  // Location
+  locationAddress String?
+  locationLat     Float?
+  locationLng     Float?
+
+  // Reading dates (for "read" action)
+  startDate DateTime?
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([bookId])
+  @@index([userId])
+  @@index([action])
+}
+
+model Exchange {
+  id     String @id @default(uuid())
+  status String @default("pending") // "pending", "accepted", "declined", "confirmed", "completed", "cancelled"
+
+  // Book being exchanged
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  // Users involved
+  requesterId String
+  requester   User   @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+
+  // Points system
+  pointsOffered Int // AI-calculated book value
+  pointsLocked  Boolean @default(false) // Points locked when pending
+  
+  // Exchange details
+  message             String?
+  meetingAddress      String?
+  meetingLat          Float?
+  meetingLng          Float?
+  scheduledAt         DateTime?
+  confirmationDeadline DateTime? // Deadline for requester to confirm
+  
+  // Book condition after exchange
+  bookConditionRating Int? // 1-5 rating given by requester after receiving
+  
+  // Declined info
+  declinedReason String?
+  declinedAt     DateTime?
+  
+  // Completion info
+  completedAt DateTime?
+  completedBy String? // "requester" or "system" (auto-complete after deadline)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([requesterId])
+  @@index([status])
+  @@index([pointsLocked])
+}
+
+model PointPackage {
+  id             String   @id @default(uuid())
+  name           String // "Starter Pack", "Popular Pack", "Bulk Pack"
+  description    String?
+  price          Float // Price in dollars
+  points         Int // Number of points in package
+  bonusPoints    Int      @default(0) // Extra bonus points
+  features       String[] // Array of features ["500 Exchange Points", "Valid for 6 months"]
+  validityMonths Int      @default(6) // Package validity in months
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0) // For displaying in order
+
+  // Badge/Label
+  badge String? // "Best Value", "Save 25%"
+
+  // Relations
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model Payment {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packageId String
+  package   PointPackage @relation(fields: [packageId], references: [id], onDelete: Restrict)
+
+  // Stripe details
+  stripeSessionId       String  @unique
+  stripePaymentIntentId String?
+
+  // Payment info
+  amount          Float // Amount paid in dollars
+  currency        String @default("usd")
+  pointsPurchased Int // Total points (package points + bonus)
+
+  // Status
+  status String @default("pending") // "pending", "completed", "failed", "refunded"
+
+  // Metadata
+  metadata Json? // Additional Stripe metadata
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime? // When payment was successful
+
+  @@index([userId])
+  @@index([packageId])
+  @@index([status])
+  @@index([stripeSessionId])
+}
