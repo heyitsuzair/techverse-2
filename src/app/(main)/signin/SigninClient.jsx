@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { Button, Input, Card, CardContent, Checkbox, Spinner } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Card,
+  CardContent,
+  Checkbox,
+  Spinner,
+} from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
 import { signIn, signInWithGoogle } from "@/lib/api/auth";
@@ -11,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { signInSchema } from "@/validationSchemas";
 import { GoogleLogin } from "@react-oauth/google";
+import { setInLocalStorage } from "@/utils/localStorage";
 
 export default function SigninClient() {
   const router = useRouterWithProgress();
@@ -24,16 +32,13 @@ export default function SigninClient() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Clear previous errors
     setErrors({});
-    
+
     // Validate using Yup schema
     try {
-      await signInSchema.validate(
-        { email, password },
-        { abortEarly: false }
-      );
+      await signInSchema.validate({ email, password }, { abortEarly: false });
     } catch (validationError) {
       const newErrors = {};
       validationError.inner.forEach((error) => {
@@ -81,8 +86,8 @@ export default function SigninClient() {
         refreshToken: response.refreshToken,
       });
 
-      const message = response.isNewUser 
-        ? "Account created successfully!" 
+      const message = response.isNewUser
+        ? "Account created successfully!"
         : "Welcome back!";
       toast.success(message, {
         description: `Welcome to BooksExchange, ${response.user.name}!`,
@@ -149,8 +154,15 @@ export default function SigninClient() {
                   {errors.general}
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* General Error */}
+                {errors.general && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{errors.general}</p>
+                  </div>
+                )}
+
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -233,7 +245,12 @@ export default function SigninClient() {
                 </div>
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Spinner size="sm" className="mr-2" />

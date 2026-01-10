@@ -12,7 +12,14 @@ import {
   ArrowRight,
   Phone,
 } from "lucide-react";
-import { Button, Input, Card, CardContent, Checkbox, Spinner } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Card,
+  CardContent,
+  Checkbox,
+  Spinner,
+} from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
 import { signUp, signInWithGoogle } from "@/lib/api/auth";
@@ -20,6 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { signUpSchema } from "@/validationSchemas";
 import { GoogleLogin } from "@react-oauth/google";
+import { setInLocalStorage } from "@/utils/localStorage";
 
 export default function SignupClient() {
   const router = useRouterWithProgress();
@@ -116,8 +124,8 @@ export default function SignupClient() {
       });
 
       // Show success toast
-      const message = response.isNewUser 
-        ? "Account created successfully!" 
+      const message = response.isNewUser
+        ? "Account created successfully!"
         : "Welcome back!";
       toast.success(message, {
         description: `Welcome to BooksExchange, ${response.user.name}!`,
@@ -183,8 +191,15 @@ export default function SignupClient() {
                   {errors.general}
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* General Error */}
+                {errors.general && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{errors.general}</p>
+                  </div>
+                )}
+
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -359,7 +374,12 @@ export default function SignupClient() {
                 </div>
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Spinner size="sm" className="mr-2" />
