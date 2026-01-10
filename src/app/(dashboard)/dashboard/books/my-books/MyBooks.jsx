@@ -12,6 +12,8 @@ import {
   LinkWithProgress,
 } from "@/components/ui";
 import routes from "@/config/routes";
+import DeleteBookModal from "./DeleteBookModal";
+// import DeleteBookModal from "./DeleteBookModal";
 import {
   BookOpen,
   Package,
@@ -131,6 +133,34 @@ const getStatusVariant = (status) => {
 
 export default function MyBooks() {
   const [activeTab, setActiveTab] = useState("owned");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+
+  // const handleDeleteClick = (book) => {
+  //   setSelectedBook(book);
+  //   setShowDeleteModal(true);
+  // };
+
+  // const handleConfirmDelete = async (bookId) => {
+  //   // Implement actual delete logic here
+  //   console.log("Deleting book:", bookId);
+  //   // After successful deletion, you might want to refresh the book list
+  //   // For now, we'll just close the modal
+  // };
+  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  // const [selectedBook, setSelectedBook] = useState(null);
+
+  const handleDeleteClick = (book) => {
+    setSelectedBook(book);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async (bookId) => {
+    // Implement actual delete logic here
+    console.log("Deleting book:", bookId);
+    // After successful deletion, you might want to refresh the book list
+    // For now, we'll just close the modal
+  };
 
   return (
     <div className="min-h-screen">
@@ -287,15 +317,27 @@ export default function MyBooks() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Edit2 className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm">
+                    <LinkWithProgress
+                      href={routes.dashboard.books.view(book.id)}
+                    >
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </Button>
+                    </LinkWithProgress>
+                    <LinkWithProgress
+                      href={routes.dashboard.books.edit(book.id)}
+                    >
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Edit2 className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    </LinkWithProgress>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteClick(book)}
+                    >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
                   </div>
@@ -460,6 +502,14 @@ export default function MyBooks() {
           </div>
         )}
       </div>
+
+      {/* Delete Modal */}
+      <DeleteBookModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        book={selectedBook}
+        onConfirmDelete={handleConfirmDelete}
+      />
     </div>
   );
 }

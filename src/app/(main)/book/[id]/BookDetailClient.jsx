@@ -119,7 +119,7 @@ export default function BookDetailClient({ params }) {
                     size="sm"
                     variant="outline"
                     onClick={() => router.push(routes.auth.signin)}
-                    className="border-amber-300 hover:bg-amber-100 whitespace-nowrap"
+                    className="border-amber-300 hover:bg-amber-100 whitespace-nowrap flex justify-end"
                   >
                     Login Now
                   </Button>
@@ -152,14 +152,14 @@ export default function BookDetailClient({ params }) {
                       <Badge
                         variant="primary"
                         size="lg"
-                        className="font-bold shadow-md"
+                        className="font-bold shadow-md mt-2"
                       >
                         🏆 {book.points} Points
                       </Badge>
                       <Badge
                         variant={book.available ? "success" : "danger"}
                         size="lg"
-                        className="font-semibold shadow-md"
+                        className="font-semibold shadow-md mt-2"
                       >
                         {book.available ? (
                           <>

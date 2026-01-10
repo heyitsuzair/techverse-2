@@ -27,7 +27,7 @@ export default function ForumPreview({
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2 text-slate-900">
               <MessageSquare className="w-5 h-5 text-primary" />
-              Community Discussions
+              <span className="text-sm md:text-base">Community Discussions</span>
             </CardTitle>
             <Badge variant="primary" className="font-semibold">
               {forumPosts} Posts

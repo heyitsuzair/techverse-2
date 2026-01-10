@@ -15,6 +15,8 @@ export default {
       add: "/dashboard/books/add",
       myBooks: "/dashboard/books/my-books",
       qrHistory: "/dashboard/books/qr-history",
+      view: (id) => `/dashboard/books/my-books/${id}/view`,
+      edit: (id) => `/dashboard/books/my-books/${id}/edit`,
     },
     wishlist: "/dashboard/wishlist",
     exchange: {
