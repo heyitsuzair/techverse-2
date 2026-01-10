@@ -137,15 +137,15 @@ export default function MarketplaceClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
       {/* Navigation */}
-      <nav className="border-b border-slate-200/60 bg-white/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
+      <nav className="border-b border-border bg-card/90 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <motion.button
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => router.push(routes.home)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
           >
             <BookOpen className="w-8 h-8 text-primary" />
             <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -156,12 +156,13 @@ export default function MarketplaceClient() {
             <Button
               variant="ghost"
               onClick={() => router.push(routes.auth.signin)}
+              className="cursor-pointer hover:bg-muted"
             >
               Login
             </Button>
             <Button
               onClick={() => router.push(routes.auth.signup)}
-              className="shadow-md hover:shadow-lg transition-shadow"
+              className="shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground cursor-pointer"
             >
               Sign Up
             </Button>
@@ -170,7 +171,7 @@ export default function MarketplaceClient() {
       </nav>
 
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-primary/10 via-secondary/5 to-primary/10 border-b border-primary/20">
+      <div className="bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 border-b border-primary/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -178,17 +179,21 @@ export default function MarketplaceClient() {
             transition={{ duration: 0.6 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-card rounded-2xl shadow-lg mb-6">
               <ShoppingBag className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               Discover Books from Our Community
             </h2>
-            <p className="text-lg md:text-xl text-slate-600 mb-6">
+            <p className="text-lg md:text-xl text-muted-foreground mb-6">
               Browse thousands of books available for exchange. Login to start
               requesting!
             </p>
-            <Badge variant="warning" size="lg" className="shadow-md">
+            <Badge
+              variant="warning"
+              size="lg"
+              className="shadow-md bg-warning/10 text-warning border border-warning/20"
+            >
               <AlertCircle className="w-4 h-4 mr-2" />
               Sign up to request books and join discussions
             </Badge>
@@ -216,10 +221,10 @@ export default function MarketplaceClient() {
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
         >
           <div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">
+            <h3 className="text-2xl font-bold text-foreground mb-2">
               Available Books
             </h3>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               Found{" "}
               <span className="font-semibold text-primary">
                 {filteredBooks.length}
@@ -231,7 +236,7 @@ export default function MarketplaceClient() {
                 selectedLocation !== "All") && (
                 <button
                   onClick={clearFilters}
-                  className="ml-2 text-sm text-primary hover:underline"
+                  className="ml-2 text-sm text-primary hover:underline cursor-pointer"
                 >
                   Clear filters
                 </button>
@@ -269,19 +274,19 @@ export default function MarketplaceClient() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-20"
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-slate-100 rounded-full flex items-center justify-center">
-              <ShoppingBag className="w-10 h-10 text-slate-400" />
+            <div className="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
+              <ShoppingBag className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">
+            <h3 className="text-2xl font-bold text-foreground mb-3">
               No books found
             </h3>
-            <p className="text-slate-600 mb-6">
+            <p className="text-muted-foreground mb-6">
               Try adjusting your filters or search query
             </p>
             <Button
               variant="outline"
               onClick={clearFilters}
-              className="shadow-md"
+              className="shadow-md border-2 border-border hover:border-primary hover:bg-primary/5 cursor-pointer"
             >
               Clear All Filters
             </Button>

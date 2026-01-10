@@ -24,7 +24,7 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
       transition={{ duration: 0.3 }}
     >
       <Card
-        className="overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-slate-200 group h-full"
+        className="overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-border group h-full bg-card"
         onClick={() => onCardClick(book.id)}
       >
         <div className="relative overflow-hidden">
@@ -34,8 +34,11 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
             className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
           />
           {!book.available && (
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center">
-              <Badge variant="danger" className="shadow-lg">
+            <div className="absolute inset-0 bg-foreground/70 backdrop-blur-sm flex items-center justify-center">
+              <Badge
+                variant="danger"
+                className="shadow-lg bg-error text-error-foreground"
+              >
                 Currently Unavailable
               </Badge>
             </div>
@@ -44,7 +47,7 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
             <Badge
               variant="primary"
               size="sm"
-              className="shadow-lg font-semibold"
+              className="shadow-lg font-semibold bg-primary text-primary-foreground"
             >
               {book.points} Points
             </Badge>
@@ -62,13 +65,13 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
             </Badge>
           </div>
 
-          <h4 className="font-bold text-slate-900 mb-1 line-clamp-1 text-lg group-hover:text-primary transition-colors">
+          <h4 className="font-bold text-card-foreground mb-1 line-clamp-1 text-lg group-hover:text-primary transition-colors">
             {book.title}
           </h4>
-          <p className="text-sm text-slate-600 mb-3">{book.author}</p>
+          <p className="text-sm text-muted-foreground mb-3">{book.author}</p>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
-            <span className="font-medium bg-slate-100 px-2 py-1 rounded">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+            <span className="font-medium bg-muted px-2 py-1 rounded">
               {book.genre}
             </span>
             <div className="flex items-center gap-1">
@@ -79,7 +82,7 @@ export default function BookCard({ book, onCardClick, onRequestClick }) {
 
           <Button
             size="sm"
-            className="w-full shadow-md hover:shadow-lg transition-all"
+            className="w-full shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             disabled={!book.available}
             onClick={(e) => {
               e.stopPropagation();

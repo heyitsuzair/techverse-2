@@ -11,7 +11,7 @@ const HOW_IT_WORKS = [
     description:
       "Explore our community marketplace filled with books from readers like you.",
     icon: BookOpen,
-    color: "from-blue-500 to-cyan-500",
+    color: "from-primary to-accent",
   },
   {
     step: 2,
@@ -19,7 +19,7 @@ const HOW_IT_WORKS = [
     description:
       "Find a book you love? Request an exchange using AI-calculated points.",
     icon: RefreshCw,
-    color: "from-purple-500 to-pink-500",
+    color: "from-secondary to-accent",
   },
   {
     step: 3,
@@ -27,7 +27,7 @@ const HOW_IT_WORKS = [
     description:
       "Connect at physical exchange points or arrange direct meetups.",
     icon: Handshake,
-    color: "from-orange-500 to-red-500",
+    color: "from-warning to-error",
   },
   {
     step: 4,
@@ -35,7 +35,7 @@ const HOW_IT_WORKS = [
     description:
       "Scan the QR code and add your reading journey to the book's history.",
     icon: BookMarked,
-    color: "from-green-500 to-emerald-500",
+    color: "from-success to-accent",
   },
 ];
 
@@ -60,7 +60,7 @@ const itemVariants = {
 
 export default function HowItWorks() {
   return (
-    <section className="relative bg-gradient-to-b from-white via-slate-50 to-white py-16 sm:py-20 md:py-24 lg:py-28">
+    <section className="relative bg-gradient-to-b from-background via-muted to-background py-16 sm:py-20 md:py-24 lg:py-28">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0 }}
@@ -69,13 +69,13 @@ export default function HowItWorks() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 md:mb-16"
         >
-          <div className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
             Simple Process
           </div>
-          <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4">
+          <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">
             How It Works
           </h3>
-          <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-2xl mx-auto px-4">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Four simple steps to start your book exchange journey
           </p>
         </motion.div>
@@ -91,9 +91,9 @@ export default function HowItWorks() {
             const Icon = item.icon;
             return (
               <motion.div key={item.step} variants={itemVariants}>
-                <Card className="relative text-center hover:shadow-2xl transition-all duration-300 border-slate-200 h-full group bg-white overflow-hidden">
+                <Card className="relative text-center hover:shadow-2xl transition-all duration-300 border-border h-full group bg-card overflow-hidden cursor-pointer">
                   {/* Decorative gradient on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-indigo-50/0 group-hover:from-blue-50 group-hover:to-indigo-50 transition-all duration-300 -z-0"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 transition-all duration-300 z-0"></div>
 
                   <CardContent className="relative p-6 md:p-8">
                     {/* Icon */}
@@ -106,24 +106,24 @@ export default function HowItWorks() {
                     </motion.div>
 
                     {/* Step Number */}
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 font-bold text-base sm:text-xl shadow-md">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-secondary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 font-bold text-base sm:text-xl shadow-md">
                       {item.step}
                     </div>
 
                     {/* Title */}
-                    <h4 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">
+                    <h4 className="text-lg sm:text-xl font-bold text-card-foreground mb-2">
                       {item.title}
                     </h4>
 
                     {/* Description */}
-                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                       {item.description}
                     </p>
                   </CardContent>
 
                   {/* Connection line for desktop */}
                   {index < HOW_IT_WORKS.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-slate-300 to-transparent"></div>
+                    <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-border to-transparent"></div>
                   )}
                 </Card>
               </motion.div>
