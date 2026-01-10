@@ -33,9 +33,14 @@ model User {
   resetPasswordExpires DateTime?
 
   // Relations
-  books     Book[]
-  exchanges Exchange[]
-  payments  Payment[]
+  books           Book[]
+  exchanges       Exchange[]
+  payments        Payment[]
+  reports         Report[]       @relation("ReportCreator")
+  resolvedReports Report[]       @relation("ReportResolver")
+  forumThreads    ForumThread[]
+  forumComments   ForumComment[]
+  stalls          Stall[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,8 +75,9 @@ model Book {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Relations
-  exchanges   Exchange[]
-  bookHistory BookHistory[]
+  exchanges    Exchange[]
+  bookHistory  BookHistory[]
+  forumThreads ForumThread[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,22 +127,22 @@ model Exchange {
   // Points system
   pointsOffered Int // AI-calculated book value
   pointsLocked  Boolean @default(false) // Points locked when pending
-  
+
   // Exchange details
-  message             String?
-  meetingAddress      String?
-  meetingLat          Float?
-  meetingLng          Float?
-  scheduledAt         DateTime?
+  message              String?
+  meetingAddress       String?
+  meetingLat           Float?
+  meetingLng           Float?
+  scheduledAt          DateTime?
   confirmationDeadline DateTime? // Deadline for requester to confirm
-  
+
   // Book condition after exchange
   bookConditionRating Int? // 1-5 rating given by requester after receiving
-  
+
   // Declined info
   declinedReason String?
   declinedAt     DateTime?
-  
+
   // Completion info
   completedAt DateTime?
   completedBy String? // "requester" or "system" (auto-complete after deadline)
@@ -205,4 +211,184 @@ model Payment {
   @@index([packageId])
   @@index([status])
   @@index([stripeSessionId])
+}
+
+model Report {
+  id       String @id @default(uuid())
+  type     String // "book_condition", "fraud", "abuse", "fake_exchange", "repeated_exchange"
+  status   String @default("pending") // "pending", "investigating", "resolved", "dismissed"
+  priority String @default("medium") // "low", "medium", "high", "critical"
+
+  // What's being reported
+  exchangeId String?
+  bookId     String?
+
+  // Who's involved
+  reporterId String
+  reporter   User   @relation("ReportCreator", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reportedUserId String? // User being reported
+
+  // Report details
+  reason      String // Main reason for report
+  description String? // Detailed description
+  evidence    Json? // Photos, screenshots, etc. (URLs)
+
+  // Book condition mismatch specifics
+  expectedCondition String? // What was promised
+  actualCondition   String? // What was received
+  conditionPhotos   String[] // Array of photo URLs
+
+  // Resolution
+  resolution      String? // How it was resolved
+  resolutionNotes String? // Admin notes
+  resolvedBy      String? // Admin user ID
+  resolvedByUser  User?     @relation("ReportResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
+  resolvedAt      DateTime?
+
+  // Actions taken
+  pointsAdjusted   Int?    @default(0) // Points refunded/adjusted
+  exchangeReversed Boolean @default(false)
+  userWarned       Boolean @default(false)
+  userSuspended    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([exchangeId])
+  @@index([bookId])
+  @@index([status])
+  @@index([type])
+  @@index([priority])
+}
+
+model ForumThread {
+  id     String @id @default(uuid())
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  // Author (optional for anonymous posts)
+  authorId    String?
+  author      User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorName  String? // Display name for anonymous posts
+  isAnonymous Boolean @default(false)
+
+  // Thread content
+  title   String
+  content String
+
+  // Organization
+  chapter String? // "Chapter 1", "Chapter 5", "General", etc.
+  tags    String[] // ["discussion", "analysis", "question", etc.]
+
+  // Moderation
+  isModerated      Boolean @default(false)
+  isPinned         Boolean @default(false)
+  isLocked         Boolean @default(false)
+  moderatedBy      String?
+  moderationReason String?
+
+  // AI Content Analysis
+  toxicityScore Float?   @default(0.0) // 0.0 - 1.0
+  flaggedByAI   Boolean  @default(false)
+  aiFlags       String[] // ["spam", "toxicity", "inappropriate", etc.]
+
+  // Stats
+  viewCount    Int @default(0)
+  commentCount Int @default(0)
+  likeCount    Int @default(0)
+
+  // Relations
+  comments ForumComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([authorId])
+  @@index([chapter])
+  @@index([isModerated])
+  @@index([isPinned])
+  @@index([flaggedByAI])
+  @@index([createdAt])
+}
+
+model ForumComment {
+  id       String      @id @default(uuid())
+  threadId String
+  thread   ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  // Author (optional for anonymous)
+  authorId    String?
+  author      User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorName  String? // Display name for anonymous
+  isAnonymous Boolean @default(false)
+
+  // Comment content
+  content String
+
+  // Nested replies
+  parentId String? // For threaded replies
+
+  // Moderation
+  isModerated      Boolean @default(false)
+  moderatedBy      String?
+  moderationReason String?
+
+  // AI Content Analysis
+  toxicityScore Float?   @default(0.0)
+  flaggedByAI   Boolean  @default(false)
+  aiFlags       String[]
+
+  // Stats
+  likeCount Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([threadId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([isModerated])
+  @@index([flaggedByAI])
+  @@index([createdAt])
+}
+
+model Stall {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  address     String
+  locationLat Float
+  locationLng Float
+
+  // Contact Information
+  contactName  String
+  contactPhone String
+  contactEmail String?
+
+  // Operating Hours
+  operatingHours String? // JSON string: {"monday": "9am-5pm", "tuesday": "closed", ...}
+  isActive       Boolean @default(true)
+
+  // Photos
+  photos String[] // Array of Cloudinary URLs
+
+  // Owner
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // Stats
+  viewCount    Int @default(0)
+  contactCount Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([locationLat, locationLng])
+  @@index([isActive])
+  @@index([createdAt])
 }

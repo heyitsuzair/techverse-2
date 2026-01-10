@@ -305,8 +305,8 @@ export async function GET(request) {
         exchange.requesterId === decoded.id
           ? "requester"
           : exchange.book.userId === decoded.id
-            ? "owner"
-            : "unknown",
+          ? "owner"
+          : "unknown",
       owner: exchange.book.user,
     }));
 

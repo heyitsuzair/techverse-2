@@ -95,15 +95,23 @@ export async function PUT(request, { params }) {
     // Check if exchange is in accepted status
     if (exchange.status !== "accepted") {
       return NextResponse.json(
-        { error: `Exchange must be accepted before confirmation. Current status: ${exchange.status}` },
+        {
+          error: `Exchange must be accepted before confirmation. Current status: ${exchange.status}`,
+        },
         { status: 400 }
       );
     }
 
     // Check if confirmation deadline has passed
-    if (exchange.confirmationDeadline && new Date() > exchange.confirmationDeadline) {
+    if (
+      exchange.confirmationDeadline &&
+      new Date() > exchange.confirmationDeadline
+    ) {
       return NextResponse.json(
-        { error: "Confirmation deadline has passed. Exchange has been auto-cancelled." },
+        {
+          error:
+            "Confirmation deadline has passed. Exchange has been auto-cancelled.",
+        },
         { status: 400 }
       );
     }
