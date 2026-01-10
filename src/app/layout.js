@@ -1,14 +1,6 @@
-import { Poppins } from "next/font/google";
 import { Providers } from "@/app/providers";
 import CustomCursor from "@/components/CustomCursor";
 import "./globals.css";
-
-const poppins = Poppins({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  display: "swap",
-});
 
 export const metadata = {
   title: "BooksExchange - Share Books, Build Community",
@@ -24,6 +16,11 @@ export default function RootLayout({ children }) {
           <CustomCursor />
           {children}
         </Providers>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
       </body>
     </html>
   );

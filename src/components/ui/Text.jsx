@@ -6,16 +6,16 @@ export function Text({
   ...props
 }) {
   const variants = {
-    h1: "text-4xl font-bold tracking-tight text-zinc-900",
-    h2: "text-3xl font-semibold tracking-tight text-zinc-900",
-    h3: "text-2xl font-semibold text-zinc-900",
-    h4: "text-xl font-semibold text-zinc-900",
-    h5: "text-lg font-semibold text-zinc-900",
-    h6: "text-base font-semibold text-zinc-900",
-    body: "text-base text-zinc-700",
-    small: "text-sm text-zinc-600",
-    caption: "text-xs text-zinc-500",
-    lead: "text-lg text-zinc-600",
+    h1: "text-4xl font-bold tracking-tight text-foreground",
+    h2: "text-3xl font-semibold tracking-tight text-foreground",
+    h3: "text-2xl font-semibold text-foreground",
+    h4: "text-xl font-semibold text-foreground",
+    h5: "text-lg font-semibold text-foreground",
+    h6: "text-base font-semibold text-foreground",
+    body: "text-base text-foreground/70",
+    small: "text-sm text-foreground/60",
+    caption: "text-xs text-foreground/50",
+    lead: "text-lg text-foreground/60",
   };
 
   const defaultTags = {
