@@ -4,6 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LinkWithProgress, Button } from "@/components/ui";
 import routes from "@/config/routes";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouterWithProgress } from "@/hooks";
+import { toast } from "sonner";
 import {
   LayoutDashboard,
   BookOpen,
@@ -57,6 +60,17 @@ export default function DashboardLayout({ children }) {
   const [expandedItems, setExpandedItems] = useState({});
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { logout, user } = useAuth();
+  const router = useRouterWithProgress();
+
+  const handleLogout = () => {
+    logout();
+    setProfileOpen(false);
+    toast.success("Logged out successfully", {
+      description: "See you next time!",
+    });
+    router.push(routes.auth.signin);
+  };
 
   const toggleExpanded = (name) => {
     setExpandedItems(prev => ({
@@ -482,10 +496,8 @@ export default function DashboardLayout({ children }) {
                           {/* Logout */}
                           <div className="border-t border-zinc-200">
                             <button
-                              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                              onClick={() => {
-                                setProfileOpen(false);
-                              }}
+                              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                              onClick={handleLogout}
                             >
                               <LogOut className="w-4 h-4" />
                               <span>Sign out</span>

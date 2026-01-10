@@ -12,12 +12,17 @@ import {
   ArrowRight,
   Phone,
 } from "lucide-react";
-import { Button, Input, Card, CardContent, Checkbox } from "@/components/ui";
+import { Button, Input, Card, CardContent, Checkbox, Spinner } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import { signUp } from "@/lib/api/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { signUpSchema } from "@/validationSchemas";
 
 export default function SignupClient() {
   const router = useRouterWithProgress();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -29,33 +34,73 @@ export default function SignupClient() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
-    setErrors({ ...errors, [field]: "" });
+    setErrors({ ...errors, [field]: "", general: "" });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = "Full name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords don't match";
-    }
-    if (!agreeTerms) newErrors.terms = "You must agree to the terms";
+    // Clear previous errors
+    setErrors({});
 
-    if (Object.keys(newErrors).length > 0) {
+    // Validate using Yup schema
+    try {
+      await signUpSchema.validate(
+        {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          agreeTerms,
+        },
+        { abortEarly: false }
+      );
+    } catch (validationError) {
+      const newErrors = {};
+      validationError.inner.forEach((error) => {
+        newErrors[error.path] = error.message;
+      });
       setErrors(newErrors);
       return;
     }
 
-    // Mock: Navigate to dashboard
-    console.log("Sign up:", formData);
-    alert("This is a frontend demo. No actual registration is performed.");
+    setIsLoading(true);
+
+    try {
+      // Call the signup API
+      const response = await signUp({
+        email: formData.email,
+        password: formData.password,
+        name: formData.fullName,
+        phone: formData.phone || undefined,
+      });
+
+      // Use the auth context to manage login state
+      login(response.user, {
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
+
+      // Show success toast
+      toast.success(response.message || "Account created successfully!", {
+        description: `Welcome to BooksExchange, ${response.user.name}!`,
+      });
+
+      // Redirect to dashboard
+      router.push(routes.dashboard.index);
+    } catch (error) {
+      setErrors({ general: error.message });
+      toast.error("Signup failed", {
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -97,6 +142,13 @@ export default function SignupClient() {
         >
           <Card className="border-slate-200 shadow-2xl">
             <CardContent className="p-6 sm:p-8">
+              {/* Error Alert */}
+              {errors.general && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {errors.general}
+                </div>
+              )}
+              
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Full Name */}
                 <div>
@@ -272,9 +324,18 @@ export default function SignupClient() {
                 </div>
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full" size="lg">
-                  Create Account
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Spinner size="sm" className="mr-2" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      Create Account
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
                 </Button>
               </form>
 

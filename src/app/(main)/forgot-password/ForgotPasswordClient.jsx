@@ -9,28 +9,58 @@ import {
   ArrowLeft,
   CheckCircle2,
 } from "lucide-react";
-import { Button, Input, Card, CardContent } from "@/components/ui";
+import { Button, Input, Card, CardContent, Spinner } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import { forgotPassword } from "@/lib/api/auth";
+import { toast } from "sonner";
+import { forgotPasswordSchema } from "@/validationSchemas";
 
 export default function ForgotPasswordClient() {
   const router = useRouterWithProgress();
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!email) {
-      setErrors({ email: "Email is required" });
+    // Clear previous errors
+    setErrors({});
+
+    // Validate using Yup schema
+    try {
+      await forgotPasswordSchema.validate(
+        { email },
+        { abortEarly: false }
+      );
+    } catch (validationError) {
+      const newErrors = {};
+      validationError.inner.forEach((error) => {
+        newErrors[error.path] = error.message;
+      });
+      setErrors(newErrors);
       return;
     }
 
-    // Mock: Show success message
-    console.log("Password reset requested for:", email);
-    setSubmitted(true);
+    setIsLoading(true);
+
+    try {
+      // Call the forgot password API
+      const response = await forgotPassword(email);
+      setSubmitted(true);
+      toast.success("Reset link sent!", {
+        description: response.message || "Check your email for the password reset link.",
+      });
+    } catch (error) {
+      setErrors({ general: error.message });
+      toast.error("Failed to send reset link", {
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,6 +116,13 @@ export default function ForgotPasswordClient() {
                     </p>
                   </div>
 
+                  {/* Error Alert */}
+                  {errors.general && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                      {errors.general}
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Email */}
                     <div>
@@ -115,9 +152,18 @@ export default function ForgotPasswordClient() {
                     </div>
 
                     {/* Submit Button */}
-                    <Button type="submit" className="w-full" size="lg">
-                      Send Reset Link
-                      <ArrowRight className="w-5 h-5 ml-2" />
+                    <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <Spinner size="sm" className="mr-2" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          Send Reset Link
+                          <ArrowRight className="w-5 h-5 ml-2" />
+                        </>
+                      )}
                     </Button>
                   </form>
 

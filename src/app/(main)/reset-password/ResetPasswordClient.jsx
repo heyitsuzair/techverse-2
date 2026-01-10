@@ -4,10 +4,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Lock, Eye, EyeOff, CheckCircle2, KeyRound } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui";
+import { Button, Spinner } from "@/components/ui";
 import { PasswordInput } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import { resetPassword } from "@/lib/api/auth";
+import { toast } from "sonner";
+import { resetPasswordSchema } from "@/validationSchemas";
 
 export default function ResetPasswordClient() {
   const router = useRouterWithProgress();
@@ -24,42 +27,63 @@ export default function ResetPasswordClient() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+  const validateForm = async () => {
+    try {
+      await resetPasswordSchema.validate(
+        {
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+        },
+        { abortEarly: false }
+      );
+      setErrors({});
+      return true;
+    } catch (validationError) {
+      const newErrors = {};
+      validationError.inner.forEach((error) => {
+        newErrors[error.path] = error.message;
+      });
+      setErrors(newErrors);
+      return false;
     }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    const isValid = await validateForm();
+    if (!isValid) return;
+
+    if (!token) {
+      toast.error("Invalid reset link", {
+        description: "The password reset link is invalid or has expired.",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await resetPassword(token, formData.password);
+      
+      toast.success("Password reset successful!", {
+        description: response.message || "Your password has been reset successfully.",
+      });
+      
       setIsSuccess(true);
 
       // Redirect to signin after 2 seconds
       setTimeout(() => {
         router.push(routes.auth.signin);
       }, 2000);
-    }, 1500);
+    } catch (error) {
+      toast.error("Password reset failed", {
+        description: error.message,
+      });
+      setErrors({ general: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -272,7 +296,7 @@ export default function ResetPasswordClient() {
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
+                  <Spinner size="sm" />
                   Resetting...
                 </span>
               ) : (

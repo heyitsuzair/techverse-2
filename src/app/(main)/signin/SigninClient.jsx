@@ -3,33 +3,72 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { Button, Input, Card, CardContent, Checkbox } from "@/components/ui";
+import { Button, Input, Card, CardContent, Checkbox, Spinner } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
+import { signIn } from "@/lib/api/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { signInSchema } from "@/validationSchemas";
 
 export default function SigninClient() {
   const router = useRouterWithProgress();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validation would happen here
-    const newErrors = {};
-    if (!email) newErrors.email = "Email is required";
-    if (!password) newErrors.password = "Password is required";
-
-    if (Object.keys(newErrors).length > 0) {
+    
+    // Clear previous errors
+    setErrors({});
+    
+    // Validate using Yup schema
+    try {
+      await signInSchema.validate(
+        { email, password },
+        { abortEarly: false }
+      );
+    } catch (validationError) {
+      const newErrors = {};
+      validationError.inner.forEach((error) => {
+        newErrors[error.path] = error.message;
+      });
       setErrors(newErrors);
       return;
     }
 
-    // Mock: Navigate to dashboard
-    console.log("Sign in:", { email, password, rememberMe });
-    alert("This is a frontend demo. No actual authentication is performed.");
+    setIsLoading(true);
+
+    try {
+      // Call the signin API
+      const response = await signIn({ email, password });
+
+      // Use the auth context to manage login state
+      login(response.user, {
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
+
+      // Show success toast
+      toast.success(response.message || "Login successful!", {
+        description: `Welcome back, ${response.user.name}!`,
+      });
+
+      // Redirect to dashboard
+      router.push(routes.dashboard.index);
+    } catch (error) {
+      setErrors({ general: error.message });
+      toast.error("Login failed", {
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,6 +112,13 @@ export default function SigninClient() {
         >
           <Card className="border-slate-200 shadow-2xl">
             <CardContent className="p-6 sm:p-8">
+              {/* Error Alert */}
+              {errors.general && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {errors.general}
+                </div>
+              )}
+              
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div>
@@ -156,9 +202,18 @@ export default function SigninClient() {
                 </div>
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full" size="lg">
-                  Sign In
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Spinner size="sm" className="mr-2" />
+                      Signing In...
+                    </>
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
                 </Button>
               </form>
 
