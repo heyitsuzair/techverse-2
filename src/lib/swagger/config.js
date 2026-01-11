@@ -46,6 +46,26 @@ export const swaggerConfig = {
       name: "Socket Messages",
       description: "Real-time chat message endpoints",
     },
+    {
+      name: "Stalls",
+      description: "Exchange point stall management endpoints",
+    },
+    {
+      name: "Exchanges",
+      description: "Book exchange request and management endpoints",
+    },
+    {
+      name: "Forums",
+      description: "Book discussion forum endpoints",
+    },
+    {
+      name: "Payments",
+      description: "Payment and point purchase endpoints",
+    },
+    {
+      name: "Reports",
+      description: "Content reporting and moderation endpoints",
+    },
   ],
   components: {
     securitySchemes: {
@@ -800,6 +820,581 @@ export const swaggerConfig = {
           error: {
             type: "string",
             example: "Error message",
+          },
+        },
+      },
+      Stall: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "stall-uuid",
+          },
+          name: {
+            type: "string",
+            example: "Central Library Book Exchange",
+          },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "A community book exchange point",
+          },
+          locationAddress: {
+            type: "string",
+            example: "123 Main St, New York, NY 10001",
+          },
+          locationLat: {
+            type: "number",
+            format: "float",
+            example: 40.7128,
+          },
+          locationLng: {
+            type: "number",
+            format: "float",
+            example: -74.006,
+          },
+          contactName: {
+            type: "string",
+            nullable: true,
+            example: "John Doe",
+          },
+          contactPhone: {
+            type: "string",
+            nullable: true,
+            example: "+1234567890",
+          },
+          contactEmail: {
+            type: "string",
+            format: "email",
+            nullable: true,
+            example: "contact@example.com",
+          },
+          operatingHours: {
+            type: "string",
+            nullable: true,
+            example: "Monday-Friday: 9AM-5PM",
+          },
+          availableGenres: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["Fiction", "Non-Fiction", "Mystery"],
+          },
+          photos: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["https://res.cloudinary.com/.../stall1.jpg"],
+          },
+          isActive: {
+            type: "boolean",
+            example: true,
+          },
+          ownerId: {
+            type: "string",
+            example: "user-uuid",
+          },
+          distance: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: 2.5,
+            description: "Distance in km (only in GET /api/stalls response)",
+          },
+          owner: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "user-uuid",
+              },
+              name: {
+                type: "string",
+                example: "John Doe",
+              },
+              profileImage: {
+                type: "string",
+                nullable: true,
+                example: "https://res.cloudinary.com/.../profile.jpg",
+              },
+              phone: {
+                type: "string",
+                nullable: true,
+                example: "+1234567890",
+              },
+            },
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T12:00:00.000Z",
+          },
+        },
+      },
+      Exchange: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "exchange-uuid",
+          },
+          bookId: {
+            type: "string",
+            example: "book-uuid",
+          },
+          requesterId: {
+            type: "string",
+            example: "user-uuid-requester",
+          },
+          ownerId: {
+            type: "string",
+            example: "user-uuid-owner",
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "accepted", "declined", "completed", "cancelled"],
+            example: "pending",
+          },
+          message: {
+            type: "string",
+            nullable: true,
+            example: "I'd love to exchange this book!",
+          },
+          meetingAddress: {
+            type: "string",
+            nullable: true,
+            example: "Central Park, New York, NY",
+          },
+          meetingLat: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: 40.7829,
+          },
+          meetingLng: {
+            type: "number",
+            format: "float",
+            nullable: true,
+            example: -73.9654,
+          },
+          scheduledAt: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+            example: "2026-01-15T14:00:00.000Z",
+          },
+          pointsOffered: {
+            type: "integer",
+            example: 100,
+          },
+          pointsAccepted: {
+            type: "integer",
+            nullable: true,
+            example: 100,
+          },
+          book: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "book-uuid",
+              },
+              title: {
+                type: "string",
+                example: "The Great Gatsby",
+              },
+              author: {
+                type: "string",
+                nullable: true,
+                example: "F. Scott Fitzgerald",
+              },
+              coverImage: {
+                type: "string",
+                nullable: true,
+                example: "https://res.cloudinary.com/.../cover.jpg",
+              },
+            },
+          },
+          requester: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "user-uuid-requester",
+              },
+              name: {
+                type: "string",
+                example: "Alice Smith",
+              },
+              profileImage: {
+                type: "string",
+                nullable: true,
+                example: "https://res.cloudinary.com/.../alice.jpg",
+              },
+            },
+          },
+          owner: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "user-uuid-owner",
+              },
+              name: {
+                type: "string",
+                example: "John Doe",
+              },
+              profileImage: {
+                type: "string",
+                nullable: true,
+                example: "https://res.cloudinary.com/.../profile.jpg",
+              },
+            },
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T12:00:00.000Z",
+          },
+        },
+      },
+      ForumThread: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "thread-uuid",
+          },
+          bookId: {
+            type: "string",
+            example: "book-uuid",
+          },
+          title: {
+            type: "string",
+            example: "What did you think of Chapter 3?",
+          },
+          content: {
+            type: "string",
+            example: "I found the plot twist absolutely surprising!",
+          },
+          chapter: {
+            type: "string",
+            nullable: true,
+            example: "Chapter 3",
+          },
+          tags: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            example: ["discussion", "spoiler"],
+          },
+          isPinned: {
+            type: "boolean",
+            example: false,
+          },
+          isLocked: {
+            type: "boolean",
+            example: false,
+          },
+          isAnonymous: {
+            type: "boolean",
+            example: false,
+          },
+          authorName: {
+            type: "string",
+            nullable: true,
+            example: "BookLover42",
+            description: "Used when isAnonymous is true",
+          },
+          viewCount: {
+            type: "integer",
+            example: 142,
+          },
+          commentCount: {
+            type: "integer",
+            example: 23,
+          },
+          likeCount: {
+            type: "integer",
+            example: 15,
+          },
+          author: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "user-uuid",
+              },
+              name: {
+                type: "string",
+                example: "John Doe",
+              },
+            },
+          },
+          book: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "book-uuid",
+              },
+              title: {
+                type: "string",
+                example: "The Great Gatsby",
+              },
+              author: {
+                type: "string",
+                nullable: true,
+                example: "F. Scott Fitzgerald",
+              },
+            },
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-05T10:30:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-05T12:00:00.000Z",
+          },
+        },
+      },
+      ForumComment: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "comment-uuid",
+          },
+          threadId: {
+            type: "string",
+            example: "thread-uuid",
+          },
+          content: {
+            type: "string",
+            example: "I completely agree with your analysis!",
+          },
+          isAnonymous: {
+            type: "boolean",
+            example: false,
+          },
+          authorName: {
+            type: "string",
+            nullable: true,
+            example: "Reader123",
+            description: "Used when isAnonymous is true",
+          },
+          likeCount: {
+            type: "integer",
+            example: 5,
+          },
+          author: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "user-uuid",
+              },
+              name: {
+                type: "string",
+                example: "John Doe",
+              },
+            },
+          },
+          thread: {
+            type: "object",
+            nullable: true,
+            properties: {
+              id: {
+                type: "string",
+                example: "thread-uuid",
+              },
+              title: {
+                type: "string",
+                example: "What did you think of Chapter 3?",
+              },
+            },
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-05T11:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-05T11:00:00.000Z",
+          },
+        },
+      },
+      PaymentPackage: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "package-uuid",
+          },
+          name: {
+            type: "string",
+            example: "Starter Pack",
+          },
+          points: {
+            type: "integer",
+            example: 100,
+          },
+          price: {
+            type: "number",
+            format: "float",
+            example: 9.99,
+          },
+          currency: {
+            type: "string",
+            example: "USD",
+          },
+          isActive: {
+            type: "boolean",
+            example: true,
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+        },
+      },
+      Payment: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "payment-uuid",
+          },
+          userId: {
+            type: "string",
+            example: "user-uuid",
+          },
+          packageId: {
+            type: "string",
+            nullable: true,
+            example: "package-uuid",
+          },
+          amount: {
+            type: "number",
+            format: "float",
+            example: 9.99,
+          },
+          currency: {
+            type: "string",
+            example: "USD",
+          },
+          points: {
+            type: "integer",
+            example: 100,
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "completed", "failed", "refunded"],
+            example: "completed",
+          },
+          stripeSessionId: {
+            type: "string",
+            nullable: true,
+            example: "cs_test_...",
+          },
+          stripePaymentIntentId: {
+            type: "string",
+            nullable: true,
+            example: "pi_...",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:05:00.000Z",
+          },
+        },
+      },
+      Report: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "report-uuid",
+          },
+          reporterId: {
+            type: "string",
+            example: "user-uuid-reporter",
+          },
+          reportedUserId: {
+            type: "string",
+            nullable: true,
+            example: "user-uuid-reported",
+          },
+          contentType: {
+            type: "string",
+            enum: ["book", "forum_thread", "forum_comment", "user", "exchange"],
+            example: "forum_thread",
+          },
+          contentId: {
+            type: "string",
+            example: "thread-uuid",
+          },
+          reason: {
+            type: "string",
+            enum: [
+              "spam",
+              "harassment",
+              "inappropriate_content",
+              "fake_information",
+              "other",
+            ],
+            example: "inappropriate_content",
+          },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "This thread contains offensive language",
+          },
+          status: {
+            type: "string",
+            enum: ["pending", "resolved", "dismissed"],
+            example: "pending",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T10:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-01-10T12:00:00.000Z",
           },
         },
       },
@@ -3047,6 +3642,2272 @@ export const swaggerConfig = {
           },
           400: {
             description: "Bad request - missing required parameters",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/stalls": {
+      get: {
+        tags: ["Stalls"],
+        summary: "Get nearby stalls",
+        description: "Get exchange point stalls within a specified radius of coordinates",
+        parameters: [
+          {
+            name: "lat",
+            in: "query",
+            required: true,
+            description: "Latitude coordinate",
+            schema: {
+              type: "number",
+              format: "float",
+              example: 40.7128,
+            },
+          },
+          {
+            name: "lng",
+            in: "query",
+            required: true,
+            description: "Longitude coordinate",
+            schema: {
+              type: "number",
+              format: "float",
+              example: -74.006,
+            },
+          },
+          {
+            name: "radius",
+            in: "query",
+            description: "Search radius in kilometers",
+            schema: {
+              type: "number",
+              format: "float",
+              default: 10,
+              example: 10,
+            },
+          },
+          {
+            name: "page",
+            in: "query",
+            description: "Page number",
+            schema: {
+              type: "integer",
+              default: 1,
+              example: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Items per page",
+            schema: {
+              type: "integer",
+              default: 20,
+              example: 20,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Stalls retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    stalls: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Stall",
+                      },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: {
+                          type: "integer",
+                          example: 1,
+                        },
+                        limit: {
+                          type: "integer",
+                          example: 20,
+                        },
+                        total: {
+                          type: "integer",
+                          example: 5,
+                        },
+                        totalPages: {
+                          type: "integer",
+                          example: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Invalid coordinates",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Stalls"],
+        summary: "Create a new stall",
+        description: "Create a new exchange point stall",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name", "locationAddress", "locationLat", "locationLng"],
+                properties: {
+                  name: {
+                    type: "string",
+                    example: "Central Library Book Exchange",
+                  },
+                  description: {
+                    type: "string",
+                    nullable: true,
+                    example: "A community book exchange point",
+                  },
+                  locationAddress: {
+                    type: "string",
+                    example: "123 Main St, New York, NY 10001",
+                  },
+                  locationLat: {
+                    type: "number",
+                    format: "float",
+                    example: 40.7128,
+                  },
+                  locationLng: {
+                    type: "number",
+                    format: "float",
+                    example: -74.006,
+                  },
+                  contactName: {
+                    type: "string",
+                    nullable: true,
+                    example: "John Doe",
+                  },
+                  contactPhone: {
+                    type: "string",
+                    nullable: true,
+                    example: "+1234567890",
+                  },
+                  contactEmail: {
+                    type: "string",
+                    format: "email",
+                    nullable: true,
+                    example: "contact@example.com",
+                  },
+                  operatingHours: {
+                    type: "string",
+                    nullable: true,
+                    example: "Monday-Friday: 9AM-5PM",
+                  },
+                  availableGenres: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                    },
+                    example: ["Fiction", "Non-Fiction", "Mystery"],
+                  },
+                  photos: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                    },
+                    example: ["https://res.cloudinary.com/.../stall1.jpg"],
+                  },
+                  isActive: {
+                    type: "boolean",
+                    default: true,
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Stall created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Stall created successfully",
+                    },
+                    stall: {
+                      $ref: "#/components/schemas/Stall",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Missing required fields",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/stalls/{id}": {
+      get: {
+        tags: ["Stalls"],
+        summary: "Get stall by ID",
+        description: "Get detailed information about a specific stall",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Stall ID",
+            schema: {
+              type: "string",
+              example: "stall-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Stall retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    stall: {
+                      $ref: "#/components/schemas/Stall",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: "Stall not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      put: {
+        tags: ["Stalls"],
+        summary: "Update stall",
+        description: "Update stall information (owner only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Stall ID",
+            schema: {
+              type: "string",
+              example: "stall-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    example: "Updated Stall Name",
+                  },
+                  description: {
+                    type: "string",
+                    nullable: true,
+                    example: "Updated description",
+                  },
+                  locationAddress: {
+                    type: "string",
+                    example: "456 New St, New York, NY 10002",
+                  },
+                  locationLat: {
+                    type: "number",
+                    format: "float",
+                    example: 40.7589,
+                  },
+                  locationLng: {
+                    type: "number",
+                    format: "float",
+                    example: -73.9851,
+                  },
+                  contactName: {
+                    type: "string",
+                    nullable: true,
+                    example: "Jane Doe",
+                  },
+                  contactPhone: {
+                    type: "string",
+                    nullable: true,
+                    example: "+1234567891",
+                  },
+                  contactEmail: {
+                    type: "string",
+                    format: "email",
+                    nullable: true,
+                    example: "newcontact@example.com",
+                  },
+                  operatingHours: {
+                    type: "string",
+                    nullable: true,
+                    example: "Monday-Saturday: 10AM-6PM",
+                  },
+                  availableGenres: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                    },
+                    example: ["Fiction", "Non-Fiction"],
+                  },
+                  photos: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                    },
+                    example: ["https://res.cloudinary.com/.../stall2.jpg"],
+                  },
+                  isActive: {
+                    type: "boolean",
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Stall updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Stall updated successfully",
+                    },
+                    stall: {
+                      $ref: "#/components/schemas/Stall",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not stall owner",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Stall not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Stalls"],
+        summary: "Delete stall",
+        description: "Delete a stall (owner only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Stall ID",
+            schema: {
+              type: "string",
+              example: "stall-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Stall deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Stall deleted successfully",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not stall owner",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Stall not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/stalls/my-stalls": {
+      get: {
+        tags: ["Stalls"],
+        summary: "Get my stalls",
+        description: "Get all stalls owned by the authenticated user",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        responses: {
+          200: {
+            description: "Stalls retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    stalls: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Stall",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/exchanges": {
+      post: {
+        tags: ["Exchanges"],
+        summary: "Request book exchange",
+        description: "Initiate a book exchange request",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["bookId"],
+                properties: {
+                  bookId: {
+                    type: "string",
+                    example: "book-uuid",
+                  },
+                  message: {
+                    type: "string",
+                    nullable: true,
+                    example: "I'd love to exchange this book!",
+                  },
+                  meetingAddress: {
+                    type: "string",
+                    nullable: true,
+                    example: "Central Park, New York, NY",
+                  },
+                  meetingLat: {
+                    type: "number",
+                    format: "float",
+                    nullable: true,
+                    example: 40.7829,
+                  },
+                  meetingLng: {
+                    type: "number",
+                    format: "float",
+                    nullable: true,
+                    example: -73.9654,
+                  },
+                  scheduledAt: {
+                    type: "string",
+                    format: "date-time",
+                    nullable: true,
+                    example: "2026-01-15T14:00:00.000Z",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Exchange request created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Exchange request created successfully",
+                    },
+                    exchange: {
+                      $ref: "#/components/schemas/Exchange",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Invalid request",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                examples: {
+                  missingBookId: {
+                    value: {
+                      error: "Book ID is required",
+                    },
+                  },
+                  selfExchange: {
+                    value: {
+                      error: "Cannot request your own book",
+                    },
+                  },
+                  notAvailable: {
+                    value: {
+                      error: "Book is not available for exchange",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/exchanges/{id}/accept": {
+      post: {
+        tags: ["Exchanges"],
+        summary: "Accept exchange request",
+        description: "Accept a pending exchange request (book owner only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Exchange ID",
+            schema: {
+              type: "string",
+              example: "exchange-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Exchange request accepted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Exchange request accepted",
+                    },
+                    exchange: {
+                      $ref: "#/components/schemas/Exchange",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Invalid request",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+                examples: {
+                  notPending: {
+                    value: {
+                      error: "Exchange is not in pending status",
+                    },
+                  },
+                  insufficientPoints: {
+                    value: {
+                      error: "Requester does not have enough points",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not book owner",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Exchange not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/exchanges/{id}/decline": {
+      post: {
+        tags: ["Exchanges"],
+        summary: "Decline exchange request",
+        description: "Decline a pending exchange request (book owner only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Exchange ID",
+            schema: {
+              type: "string",
+              example: "exchange-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Exchange request declined successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Exchange request declined",
+                    },
+                    exchange: {
+                      $ref: "#/components/schemas/Exchange",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Exchange not in pending status",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not book owner",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Exchange not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/exchanges/{id}/confirm": {
+      post: {
+        tags: ["Exchanges"],
+        summary: "Confirm exchange completion",
+        description: "Confirm that an exchange has been completed (both parties)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Exchange ID",
+            schema: {
+              type: "string",
+              example: "exchange-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Exchange confirmed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Exchange confirmed successfully",
+                    },
+                    exchange: {
+                      $ref: "#/components/schemas/Exchange",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Exchange not in accepted status",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Exchange not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/books/{id}/forums": {
+      get: {
+        tags: ["Forums"],
+        summary: "Get forum threads for a book",
+        description: "Get all forum threads for a specific book with filtering and pagination",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+          {
+            name: "chapter",
+            in: "query",
+            description: "Filter by chapter",
+            schema: {
+              type: "string",
+              example: "Chapter 3",
+            },
+          },
+          {
+            name: "sortBy",
+            in: "query",
+            description: "Sort order",
+            schema: {
+              type: "string",
+              enum: ["latest", "popular", "pinned"],
+              default: "latest",
+              example: "latest",
+            },
+          },
+          {
+            name: "page",
+            in: "query",
+            description: "Page number",
+            schema: {
+              type: "integer",
+              default: 1,
+              example: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Items per page",
+            schema: {
+              type: "integer",
+              default: 20,
+              example: 20,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Threads retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    threads: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/ForumThread",
+                      },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: {
+                          type: "integer",
+                          example: 1,
+                        },
+                        limit: {
+                          type: "integer",
+                          example: 20,
+                        },
+                        total: {
+                          type: "integer",
+                          example: 12,
+                        },
+                        totalPages: {
+                          type: "integer",
+                          example: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Forums"],
+        summary: "Create forum thread",
+        description: "Create a new forum thread for a book",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Book ID",
+            schema: {
+              type: "string",
+              example: "book-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["title", "content"],
+                properties: {
+                  title: {
+                    type: "string",
+                    example: "What did you think of Chapter 3?",
+                  },
+                  content: {
+                    type: "string",
+                    example: "I found the plot twist absolutely surprising!",
+                  },
+                  chapter: {
+                    type: "string",
+                    nullable: true,
+                    example: "Chapter 3",
+                  },
+                  tags: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                    },
+                    example: ["discussion", "spoiler"],
+                  },
+                  isAnonymous: {
+                    type: "boolean",
+                    default: false,
+                    example: false,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Thread created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Thread created successfully",
+                    },
+                    thread: {
+                      $ref: "#/components/schemas/ForumThread",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Missing required fields or content moderation failed",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Book not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/forums/{id}": {
+      get: {
+        tags: ["Forums"],
+        summary: "Get forum thread or comment by ID",
+        description: "Get a specific forum thread or comment by its ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Thread or Comment ID",
+            schema: {
+              type: "string",
+              example: "thread-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Thread or comment retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  oneOf: [
+                    {
+                      type: "object",
+                      properties: {
+                        type: {
+                          type: "string",
+                          example: "thread",
+                        },
+                        data: {
+                          $ref: "#/components/schemas/ForumThread",
+                        },
+                      },
+                    },
+                    {
+                      type: "object",
+                      properties: {
+                        type: {
+                          type: "string",
+                          example: "comment",
+                        },
+                        data: {
+                          $ref: "#/components/schemas/ForumComment",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          404: {
+            description: "Thread or comment not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      put: {
+        tags: ["Forums"],
+        summary: "Update forum thread",
+        description: "Update a forum thread (author only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Thread ID",
+            schema: {
+              type: "string",
+              example: "thread-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  title: {
+                    type: "string",
+                    example: "Updated thread title",
+                  },
+                  content: {
+                    type: "string",
+                    example: "Updated thread content",
+                  },
+                  chapter: {
+                    type: "string",
+                    nullable: true,
+                    example: "Chapter 4",
+                  },
+                  tags: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                    },
+                    example: ["updated", "tags"],
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Thread updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Thread updated successfully",
+                    },
+                    thread: {
+                      $ref: "#/components/schemas/ForumThread",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not thread author",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Thread not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Forums"],
+        summary: "Delete forum thread",
+        description: "Delete a forum thread (author only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Thread ID",
+            schema: {
+              type: "string",
+              example: "thread-uuid",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Thread deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Thread deleted successfully",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Not thread author",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Thread not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/forums/{id}/comments": {
+      get: {
+        tags: ["Forums"],
+        summary: "Get comments for a thread",
+        description: "Get all comments for a forum thread with pagination",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Thread ID",
+            schema: {
+              type: "string",
+              example: "thread-uuid",
+            },
+          },
+          {
+            name: "page",
+            in: "query",
+            description: "Page number",
+            schema: {
+              type: "integer",
+              default: 1,
+              example: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Items per page",
+            schema: {
+              type: "integer",
+              default: 20,
+              example: 20,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Comments retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    comments: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/ForumComment",
+                      },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: {
+                          type: "integer",
+                          example: 1,
+                        },
+                        limit: {
+                          type: "integer",
+                          example: 20,
+                        },
+                        total: {
+                          type: "integer",
+                          example: 23,
+                        },
+                        totalPages: {
+                          type: "integer",
+                          example: 2,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: "Thread not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Forums"],
+        summary: "Add comment to thread",
+        description: "Add a comment to a forum thread",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Thread ID",
+            schema: {
+              type: "string",
+              example: "thread-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["content"],
+                properties: {
+                  content: {
+                    type: "string",
+                    example: "I completely agree with your analysis!",
+                  },
+                  isAnonymous: {
+                    type: "boolean",
+                    default: false,
+                    example: false,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Comment added successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Comment added successfully",
+                    },
+                    comment: {
+                      $ref: "#/components/schemas/ForumComment",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Missing content or content moderation failed",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Thread not found",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/packages": {
+      get: {
+        tags: ["Payments"],
+        summary: "Get payment packages",
+        description: "Get all available point purchase packages",
+        responses: {
+          200: {
+            description: "Packages retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    packages: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/PaymentPackage",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/create-session": {
+      post: {
+        tags: ["Payments"],
+        summary: "Create payment session",
+        description: "Create a Stripe checkout session for purchasing points",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["packageId"],
+                properties: {
+                  packageId: {
+                    type: "string",
+                    example: "package-uuid",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Payment session created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    sessionId: {
+                      type: "string",
+                      example: "cs_test_...",
+                    },
+                    url: {
+                      type: "string",
+                      example: "https://checkout.stripe.com/...",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Invalid package",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payments/history": {
+      get: {
+        tags: ["Payments"],
+        summary: "Get payment history",
+        description: "Get payment history for the authenticated user",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            description: "Page number",
+            schema: {
+              type: "integer",
+              default: 1,
+              example: 1,
+            },
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Items per page",
+            schema: {
+              type: "integer",
+              default: 20,
+              example: 20,
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Payment history retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    payments: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Payment",
+                      },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: {
+                          type: "integer",
+                          example: 1,
+                        },
+                        limit: {
+                          type: "integer",
+                          example: 20,
+                        },
+                        total: {
+                          type: "integer",
+                          example: 5,
+                        },
+                        totalPages: {
+                          type: "integer",
+                          example: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/reports": {
+      post: {
+        tags: ["Reports"],
+        summary: "Create a report",
+        description: "Report inappropriate content or user behavior",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["contentType", "contentId", "reason"],
+                properties: {
+                  contentType: {
+                    type: "string",
+                    enum: ["book", "forum_thread", "forum_comment", "user", "exchange"],
+                    example: "forum_thread",
+                  },
+                  contentId: {
+                    type: "string",
+                    example: "thread-uuid",
+                  },
+                  reportedUserId: {
+                    type: "string",
+                    nullable: true,
+                    example: "user-uuid",
+                    description: "Required if contentType is 'user'",
+                  },
+                  reason: {
+                    type: "string",
+                    enum: [
+                      "spam",
+                      "harassment",
+                      "inappropriate_content",
+                      "fake_information",
+                      "other",
+                    ],
+                    example: "inappropriate_content",
+                  },
+                  description: {
+                    type: "string",
+                    nullable: true,
+                    example: "This thread contains offensive language",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Report created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Report submitted successfully",
+                    },
+                    report: {
+                      $ref: "#/components/schemas/Report",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Missing required fields",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal server error",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/reports/{id}/resolve": {
+      post: {
+        tags: ["Reports"],
+        summary: "Resolve a report",
+        description: "Resolve or dismiss a report (admin only)",
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            description: "Report ID",
+            schema: {
+              type: "string",
+              example: "report-uuid",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["action"],
+                properties: {
+                  action: {
+                    type: "string",
+                    enum: ["resolve", "dismiss"],
+                    example: "resolve",
+                  },
+                  notes: {
+                    type: "string",
+                    nullable: true,
+                    example: "Content removed per community guidelines",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Report resolved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    message: {
+                      type: "string",
+                      example: "Report resolved successfully",
+                    },
+                    report: {
+                      $ref: "#/components/schemas/Report",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad request - Invalid action",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Admin access required",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/Error",
+                },
+              },
+            },
+          },
+          404: {
+            description: "Report not found",
             content: {
               "application/json": {
                 schema: {
