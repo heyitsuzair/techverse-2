@@ -76,9 +76,9 @@ body {
 }
 
 /* Custom Cursor Styles - Commented out for now */
-/* * {
+* {
   cursor: none !important;
-} */
+}
 
 /* Smooth scrolling */
 html {

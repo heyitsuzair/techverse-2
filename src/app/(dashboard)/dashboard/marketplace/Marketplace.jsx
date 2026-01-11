@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -11,6 +11,7 @@ import {
   Input,
   Select,
   Badge,
+  Spinner,
 } from "@/components/ui";
 import {
   Search,
@@ -23,8 +24,11 @@ import {
   TrendingUp,
   X,
 } from "lucide-react";
+import { getBooks } from "@/lib/api/books";
+import { useRouter } from "next/navigation";
+import routes from "@/config/routes";
 
-// Mock Data
+// Mock Data (fallback)
 const MOCK_BOOKS = [
   {
     id: 1,
@@ -127,6 +131,10 @@ const SORT_OPTIONS = [
 ];
 
 export default function Marketplace() {
+  const router = useRouter();
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("All Genres");
   const [selectedCondition, setSelectedCondition] = useState("All Conditions");
@@ -135,7 +143,60 @@ export default function Marketplace() {
   const [maxPoints, setMaxPoints] = useState("");
   const [maxDistance, setMaxDistance] = useState("");
 
-  const filteredBooks = MOCK_BOOKS.filter((book) => {
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const filters = {};
+      if (selectedGenre !== "All Genres") filters.genre = selectedGenre;
+      if (selectedCondition !== "All Conditions") filters.condition = selectedCondition;
+      if (searchQuery) filters.search = searchQuery;
+
+      const response = await getBooks(filters);
+      if (response.success && response.books) {
+        // Map API response to expected format
+        const mappedBooks = response.books.map((book) => ({
+          id: book.id,
+          title: book.title,
+          author: book.author || "Unknown Author",
+          genre: book.genre,
+          condition: book.condition,
+          points: book.pointValue || 0,
+          location: book.locationAddress || "Location not specified",
+          distance: "N/A", // Distance calculation would need user location
+          owner: book.user?.name || "Unknown",
+          rating: 4.5, // Default rating if not available
+          available: book.isAvailable !== false,
+          coverImage: book.coverImage,
+        }));
+        setBooks(mappedBooks);
+      } else {
+        setBooks([]);
+      }
+    } catch (err) {
+      console.error("Error fetching books:", err);
+      setError(err.message || "Failed to load books");
+      setBooks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Debounce search and refetch when filters change
+    const timer = setTimeout(() => {
+      if (!loading) {
+        fetchBooks();
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedGenre, selectedCondition]);
+
+  const filteredBooks = books.filter((book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -282,8 +343,7 @@ export default function Marketplace() {
         {/* Results Count */}
         <div className="flex items-center justify-between mb-6">
           <Text variant="body" className="text-zinc-600">
-            Found {filteredBooks.length} book
-            {filteredBooks.length !== 1 ? "s" : ""}
+            {loading ? "Loading..." : `Found ${filteredBooks.length} book${filteredBooks.length !== 1 ? "s" : ""}`}
           </Text>
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-zinc-500" />
@@ -293,15 +353,45 @@ export default function Marketplace() {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <Spinner size="lg" />
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <Card className="mb-6">
+            <CardContent className="py-8 text-center">
+              <Text variant="body" className="text-red-600 mb-4">
+                {error}
+              </Text>
+              <Button onClick={fetchBooks} variant="outline">
+                Retry
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Books Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBooks.map((book) => (
+        {!loading && !error && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredBooks.map((book) => (
             <Card key={book.id} className="hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
-                {/* Book Image Placeholder */}
-                <div className="w-full h-48 bg-linear-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center">
-                  <BookOpen className="w-16 h-16 text-primary opacity-50" />
-                </div>
+                {/* Book Image */}
+                {book.coverImage ? (
+                  <img
+                    src={book.coverImage}
+                    alt={book.title}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-linear-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center">
+                    <BookOpen className="w-16 h-16 text-primary opacity-50" />
+                  </div>
+                )}
 
                 {/* Status Badge */}
                 <div className="flex items-center justify-between mb-3">
@@ -353,8 +443,13 @@ export default function Marketplace() {
                 {/* Action Buttons */}
                 {book.available ? (
                   <div className="grid grid-cols-3 gap-2">
-                    <Button variant="primary" size="sm" className="col-span-3">
-                      Request Book
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="col-span-3"
+                      onClick={() => router.push(routes.book.detail(book.id))}
+                    >
+                      View Details
                     </Button>
                     <Button variant="outline" size="sm">
                       <Heart className="w-4 h-4" />
@@ -378,10 +473,11 @@ export default function Marketplace() {
               </CardContent>
             </Card>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* No Results */}
-        {filteredBooks.length === 0 && (
+        {!loading && !error && filteredBooks.length === 0 && (
           <Card>
             <CardContent className="py-8 sm:py-12 text-center">
               <Search className="w-16 h-16 text-zinc-400 mx-auto mb-4" />

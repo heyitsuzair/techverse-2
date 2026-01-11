@@ -41,7 +41,7 @@ export default function AddStallModal({
       setFormData({
         name: editStall.name || "",
         description: editStall.description || "",
-        locationAddress: editStall.locationAddress || "",
+        locationAddress: editStall.locationAddress || editStall.address || "",
         locationLat: editStall.locationLat,
         locationLng: editStall.locationLng,
         contactPhone: editStall.contactPhone || "",

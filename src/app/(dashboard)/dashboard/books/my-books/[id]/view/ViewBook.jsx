@@ -27,6 +27,7 @@ import {
   Trash2,
   Star,
   MessageSquare,
+  CheckCircle2,
 } from "lucide-react";
 import DeleteBookModal from "../../DeleteBookModal";
 

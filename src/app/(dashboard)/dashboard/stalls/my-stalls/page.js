@@ -116,14 +116,14 @@ export default function MyStalls() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 p-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             My Exchange Stalls
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600">
             Manage your physical book exchange locations
           </p>
         </div>
@@ -131,13 +131,13 @@ export default function MyStalls() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
           {error}
         </div>
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6">
           <div className="text-3xl font-bold text-blue-600">
             {stalls.length}
@@ -208,9 +208,9 @@ export default function MyStalls() {
 
               <div className="p-6">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-5">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
                       {stall.name}
                     </h3>
                     <Badge variant={stall.isActive ? "success" : "secondary"}>
@@ -221,13 +221,13 @@ export default function MyStalls() {
 
                 {/* Description */}
                 {stall.description && (
-                  <p className="text-gray-600 mb-4 line-clamp-2">
+                  <p className="text-gray-600 mb-5 line-clamp-2">
                     {stall.description}
                   </p>
                 )}
 
                 {/* Location */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-3 mb-5">
                   <div className="flex items-start text-gray-600">
                     <svg
                       className="w-5 h-5 mr-2 flex-shrink-0"
@@ -312,7 +312,7 @@ export default function MyStalls() {
                 )}
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex gap-3 pt-5 border-t border-gray-200">
                   <Button
                     onClick={() => handleEdit(stall)}
                     variant="outline"
@@ -331,7 +331,7 @@ export default function MyStalls() {
                 </div>
 
                 {/* Metadata */}
-                <div className="mt-4 pt-4 border-t text-xs text-gray-500">
+                <div className="mt-5 pt-4 border-t border-gray-100 text-xs text-gray-500">
                   Created {new Date(stall.createdAt).toLocaleDateString()}
                 </div>
               </div>

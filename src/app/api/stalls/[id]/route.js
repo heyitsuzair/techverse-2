@@ -9,7 +9,7 @@ import { validateAuthHeader } from "@/lib/auth/token-utils";
  */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -66,6 +66,7 @@ export async function GET(request, { params }) {
       success: true,
       stall: {
         ...stall,
+        locationAddress: stall.address, // Map address to locationAddress for frontend
         operatingHours,
         viewCount: stall.viewCount + 1, // Return updated count
       },
@@ -85,7 +86,7 @@ export async function GET(request, { params }) {
  */
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -102,12 +103,21 @@ export async function PUT(request, { params }) {
     }
 
     // Verify token and get user ID
-    const decoded = verifyAccessToken(token);
-    if (!decoded || !decoded.userId) {
+    let decoded;
+    try {
+      decoded = verifyAccessToken(token);
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    if (!decoded || !decoded.id) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const userId = decoded.userId;
+    const userId = decoded.id;
 
     // Check if stall exists and user is the owner
     const existingStall = await prisma.stall.findUnique({
@@ -132,6 +142,7 @@ export async function PUT(request, { params }) {
       name,
       description,
       address,
+      locationAddress,
       locationLat,
       locationLng,
       contactName,
@@ -165,14 +176,16 @@ export async function PUT(request, { params }) {
       updateData.description = description?.trim() || null;
     }
 
-    if (address !== undefined) {
-      if (address.trim().length < 5) {
+    // Handle address - accept either address or locationAddress
+    const addressToUpdate = address !== undefined ? address : locationAddress;
+    if (addressToUpdate !== undefined) {
+      if (!addressToUpdate || !addressToUpdate.trim()) {
         return NextResponse.json(
-          { error: "Address must be at least 5 characters" },
+          { error: "Address is required" },
           { status: 400 }
         );
       }
-      updateData.address = address.trim();
+      updateData.address = addressToUpdate.trim();
     }
 
     if (locationLat !== undefined && locationLng !== undefined) {
@@ -230,14 +243,25 @@ export async function PUT(request, { params }) {
 
     if (operatingHours !== undefined) {
       if (operatingHours) {
-        try {
-          JSON.parse(operatingHours);
-          updateData.operatingHours = operatingHours;
-        } catch (error) {
-          return NextResponse.json(
-            { error: "Operating hours must be valid JSON" },
-            { status: 400 }
-          );
+        // Accept string or JSON format
+        if (typeof operatingHours === "string") {
+          try {
+            const parsed = JSON.parse(operatingHours);
+            if (typeof parsed === "object") {
+              updateData.operatingHours = JSON.stringify(parsed);
+            } else {
+              // If it's not valid JSON, store as-is (plain string)
+              updateData.operatingHours = operatingHours;
+            }
+          } catch (error) {
+            // If parsing fails, store as plain string
+            updateData.operatingHours = operatingHours;
+          }
+        } else if (typeof operatingHours === "object") {
+          // If it's already an object, stringify it
+          updateData.operatingHours = JSON.stringify(operatingHours);
+        } else {
+          updateData.operatingHours = String(operatingHours);
         }
       } else {
         updateData.operatingHours = null;
@@ -278,7 +302,10 @@ export async function PUT(request, { params }) {
     return NextResponse.json({
       success: true,
       message: "Stall updated successfully",
-      stall: updatedStall,
+      stall: {
+        ...updatedStall,
+        locationAddress: updatedStall.address, // Map address to locationAddress for frontend
+      },
     });
   } catch (error) {
     console.error("Update stall error:", error);
@@ -295,7 +322,7 @@ export async function PUT(request, { params }) {
  */
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
@@ -312,12 +339,21 @@ export async function DELETE(request, { params }) {
     }
 
     // Verify token and get user ID
-    const decoded = verifyAccessToken(token);
-    if (!decoded || !decoded.userId) {
+    let decoded;
+    try {
+      decoded = verifyAccessToken(token);
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    if (!decoded || !decoded.id) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const userId = decoded.userId;
+    const userId = decoded.id;
 
     // Check if stall exists and user is the owner
     const existingStall = await prisma.stall.findUnique({

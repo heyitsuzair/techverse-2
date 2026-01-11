@@ -135,8 +135,17 @@ export async function POST(request) {
     }
 
     // Verify token and get user
-    const decoded = verifyAccessToken(token);
-    if (!decoded || !decoded.userId) {
+    let decoded;
+    try {
+      decoded = verifyAccessToken(token);
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    if (!decoded || !decoded.id) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
@@ -146,6 +155,7 @@ export async function POST(request) {
       name,
       description,
       address,
+      locationAddress,
       locationLat,
       locationLng,
       contactName,
@@ -155,6 +165,9 @@ export async function POST(request) {
       photos,
     } = body;
 
+    // Use locationAddress if provided, otherwise fall back to address
+    const finalAddress = locationAddress || address;
+
     // Validation
     if (!name || name.trim().length < 3) {
       return NextResponse.json(
@@ -163,9 +176,9 @@ export async function POST(request) {
       );
     }
 
-    if (!address || address.trim().length < 5) {
+    if (!finalAddress || !finalAddress.trim()) {
       return NextResponse.json(
-        { error: "Address must be at least 5 characters" },
+        { error: "Address is required" },
         { status: 400 }
       );
     }
@@ -184,7 +197,9 @@ export async function POST(request) {
       );
     }
 
-    if (!contactName || contactName.trim().length < 2) {
+    // Use decoded.name as fallback for contactName if not provided
+    const finalContactName = contactName || decoded.name || "Stall Owner";
+    if (!finalContactName || finalContactName.trim().length < 2) {
       return NextResponse.json(
         { error: "Contact name is required" },
         { status: 400 }
@@ -206,18 +221,26 @@ export async function POST(request) {
       );
     }
 
-    // Validate operating hours if provided
+    // Validate operating hours if provided (accept string or JSON)
+    let finalOperatingHours = operatingHours;
     if (operatingHours) {
-      try {
-        const parsed = JSON.parse(operatingHours);
-        if (typeof parsed !== "object") {
-          throw new Error("Invalid format");
+      // If it's already a string, try to parse it as JSON
+      if (typeof operatingHours === "string") {
+        try {
+          const parsed = JSON.parse(operatingHours);
+          if (typeof parsed === "object") {
+            finalOperatingHours = JSON.stringify(parsed);
+          } else {
+            // If it's not valid JSON, store as-is (plain string)
+            finalOperatingHours = operatingHours;
+          }
+        } catch (error) {
+          // If parsing fails, store as plain string
+          finalOperatingHours = operatingHours;
         }
-      } catch (error) {
-        return NextResponse.json(
-          { error: "Operating hours must be valid JSON" },
-          { status: 400 }
-        );
+      } else if (typeof operatingHours === "object") {
+        // If it's already an object, stringify it
+        finalOperatingHours = JSON.stringify(operatingHours);
       }
     }
 
@@ -226,15 +249,15 @@ export async function POST(request) {
       data: {
         name: name.trim(),
         description: description?.trim() || null,
-        address: address.trim(),
+        address: finalAddress.trim(),
         locationLat,
         locationLng,
-        contactName: contactName.trim(),
+        contactName: finalContactName.trim(),
         contactPhone: contactPhone.trim(),
         contactEmail: contactEmail?.trim() || null,
-        operatingHours: operatingHours || null,
+        operatingHours: finalOperatingHours || null,
         photos: photos || [],
-        ownerId: decoded.userId,
+        ownerId: decoded.id,
       },
       include: {
         owner: {
@@ -252,7 +275,10 @@ export async function POST(request) {
       {
         success: true,
         message: "Stall created successfully",
-        stall,
+        stall: {
+          ...stall,
+          locationAddress: stall.address, // Map address to locationAddress for frontend
+        },
       },
       { status: 201 }
     );

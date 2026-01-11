@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import { Providers } from "@/app/providers";
 import "./globals.css";
+import CustomCursor from "@/components/CustomCursor";
 // import CustomCursor from "@/components/CustomCursor"; // Commented out for now
 
 const poppins = Poppins({
@@ -20,7 +21,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased`}>
         <Providers>
-          {/* <CustomCursor /> */}
+          <CustomCursor />
           {children}
         </Providers>
       </body>

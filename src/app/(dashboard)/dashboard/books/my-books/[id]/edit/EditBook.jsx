@@ -30,6 +30,7 @@ import {
   Trash2,
   Image as ImageIcon,
   X,
+  MapPin,
 } from "lucide-react";
 import DeleteImageModal from "./DeleteImageModal";
 
@@ -78,6 +79,17 @@ const BOOK_CONDITIONS = [
   { value: "fair", label: "Fair", description: "Visible wear but fully readable" },
   { value: "poor", label: "Poor", description: "Significant wear, pages intact" }
 ];
+
+// Convert to format expected by Select component
+const GENRE_OPTIONS = BOOK_GENRES.map(genre => ({
+  value: genre,
+  label: genre
+}));
+
+const CONDITION_OPTIONS = BOOK_CONDITIONS.map(condition => ({
+  value: condition.value,
+  label: condition.label
+}));
 
 export default function EditBook({ params }) {
   const router = useRouter();

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, AlertCircle } from "lucide-react";
-import { Button, Badge } from "@/components/ui";
+import { Button, Badge, Spinner } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
 import Navigation from "@/app/Navigation";
@@ -11,7 +11,9 @@ import Footer from "@/app/Footer";
 import SearchFilters from "./SearchFilters";
 import BookCard from "./BookCard";
 import LoginModal from "./LoginModal";
+import { getBooks } from "@/lib/api/books";
 
+// Mock data for fallback (if API fails)
 const MOCK_BOOKS = [
   {
     id: 1,
@@ -111,13 +113,67 @@ const MOCK_BOOKS = [
 
 export default function MarketplaceClient() {
   const router = useRouterWithProgress();
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("All");
   const [selectedCondition, setSelectedCondition] = useState("All");
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const filteredBooks = MOCK_BOOKS.filter((book) => {
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  useEffect(() => {
+    // Debounce search and refetch when filters change
+    const timer = setTimeout(() => {
+      if (!loading) {
+        fetchBooks();
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedGenre, selectedCondition]);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const filters = {};
+      if (selectedGenre !== "All") filters.genre = selectedGenre;
+      if (selectedCondition !== "All") filters.condition = selectedCondition;
+      if (searchQuery) filters.search = searchQuery;
+
+      const response = await getBooks(filters);
+      if (response.success && response.books) {
+        // Map API response to expected format
+        const mappedBooks = response.books.map((book) => ({
+          id: book.id,
+          title: book.title,
+          author: book.author || "Unknown Author",
+          genre: book.genre,
+          condition: book.condition,
+          points: book.pointValue || 0,
+          location: book.locationAddress || "Location not specified",
+          available: book.isAvailable !== false,
+          imageUrl: book.coverImage,
+        }));
+        setBooks(mappedBooks);
+      } else {
+        setBooks([]);
+      }
+    } catch (err) {
+      console.error("Error fetching books:", err);
+      setError(err.message || "Failed to load books");
+      // Fallback to empty array instead of mock data
+      setBooks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredBooks = books.filter((book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -197,28 +253,61 @@ export default function MarketplaceClient() {
                 Available Books
               </h3>
               <p className="text-muted-foreground">
-                Found{" "}
-                <span className="font-semibold text-primary">
-                  {filteredBooks.length}
-                </span>{" "}
-                books
-                {(searchQuery ||
-                  selectedGenre !== "All" ||
-                  selectedCondition !== "All" ||
-                  selectedLocation !== "All") && (
-                  <button
-                    onClick={clearFilters}
-                    className="ml-2 text-sm text-primary hover:underline cursor-pointer"
-                  >
-                    Clear filters
-                  </button>
+                {loading ? (
+                  "Loading books..."
+                ) : (
+                  <>
+                    Found{" "}
+                    <span className="font-semibold text-primary">
+                      {filteredBooks.length}
+                    </span>{" "}
+                    books
+                    {(searchQuery ||
+                      selectedGenre !== "All" ||
+                      selectedCondition !== "All" ||
+                      selectedLocation !== "All") && (
+                      <button
+                        onClick={clearFilters}
+                        className="ml-2 text-sm text-primary hover:underline cursor-pointer"
+                      >
+                        Clear filters
+                      </button>
+                    )}
+                  </>
                 )}
               </p>
             </div>
           </motion.div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-20">
+              <Spinner size="lg" />
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <div className="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
+                <AlertCircle className="w-10 h-10 text-destructive" />
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-3">
+                Error loading books
+              </h3>
+              <p className="text-muted-foreground mb-6">{error}</p>
+              <Button variant="outline" onClick={fetchBooks}>
+                Retry
+              </Button>
+            </motion.div>
+          )}
+
           {/* Books Grid */}
-          {filteredBooks.length > 0 ? (
+          {!loading && !error && filteredBooks.length > 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -241,28 +330,31 @@ export default function MarketplaceClient() {
               ))}
             </motion.div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-20"
-            >
-              <div className="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
-                <ShoppingBag className="w-10 h-10 text-muted-foreground" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3">
-                No books found
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Try adjusting your filters or search query
-              </p>
-              <Button
-                variant="outline"
-                onClick={clearFilters}
-                className="shadow-md border-2 border-border hover:border-primary hover:bg-primary/5 cursor-pointer"
+            !loading &&
+            !error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-20"
               >
-                Clear All Filters
-              </Button>
-            </motion.div>
+                <div className="w-20 h-20 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
+                  <ShoppingBag className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-3">
+                  No books found
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Try adjusting your filters or search query
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={clearFilters}
+                  className="shadow-md border-2 border-border hover:border-primary hover:bg-primary/5 cursor-pointer"
+                >
+                  Clear All Filters
+                </Button>
+              </motion.div>
+            )
           )}
         </div>
 

@@ -1,42 +1,44 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import jwt from "jsonwebtoken";
+import { prisma } from "@/lib/prisma";
+import { verifyAccessToken } from "@/lib/auth/jwt";
+import { validateAuthHeader } from "@/lib/auth/token-utils";
 
 export async function GET(request) {
   try {
-    // Get token from Authorization header
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Authorization token required" },
-        { status: 401 }
-      );
+    // Validate and extract token
+    const { token, error: tokenError } = validateAuthHeader(request);
+
+    if (tokenError) {
+      return NextResponse.json({ error: tokenError }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
+    // Verify token
     let decoded;
-
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
+      decoded = verifyAccessToken(token);
+    } catch (error) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 401 }
       );
     }
 
-    const userId = decoded.userId;
+    if (!decoded || !decoded.id) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const userId = decoded.id;
 
     // Fetch user's stalls
     const stalls = await prisma.stall.findMany({
       where: {
-        userId: userId,
+        ownerId: userId,
       },
       orderBy: {
         createdAt: "desc",
       },
       include: {
-        user: {
+        owner: {
           select: {
             id: true,
             name: true,
@@ -46,15 +48,21 @@ export async function GET(request) {
       },
     });
 
+    // Map address to locationAddress for frontend consistency
+    const stallsWithLocationAddress = stalls.map((stall) => ({
+      ...stall,
+      locationAddress: stall.address,
+    }));
+
     return NextResponse.json({
       success: true,
-      stalls,
+      stalls: stallsWithLocationAddress,
       count: stalls.length,
     });
   } catch (error) {
     console.error("Get my stalls error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch stalls" },
+      { error: error.message || "Failed to fetch stalls" },
       { status: 500 }
     );
   }

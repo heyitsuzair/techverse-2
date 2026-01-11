@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyAccessToken } from "@/lib/auth/jwt";
 import { validateAuthHeader } from "@/lib/auth/token-utils";
-import uploadToCloudinary from "@/utils/uploadToCloudinary";
+import uploadToCloudinaryServer from "@/utils/uploadToCloudinaryServer";
 import deleteFromCloudinary from "@/utils/deleteFromCloudinary";
 import { extractPublicId, isCloudinaryUrl } from "@/utils/cloudinaryHelpers";
 
@@ -91,7 +91,7 @@ export async function PUT(request) {
         const buffer = Buffer.from(bytes);
 
         // Upload to Cloudinary
-        const uploadResult = await uploadToCloudinary(
+        const uploadResult = await uploadToCloudinaryServer(
           { buffer },
           {
             folder: "user-profiles",

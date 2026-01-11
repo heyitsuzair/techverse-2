@@ -1,13 +1,25 @@
 /**
  * Upload file to Cloudinary from browser
  * This works in client components (browser environment)
+ * For server-side uploads, use uploadToCloudinaryServer instead
  */
-const uploadToCloudinary = async (file, folder = "general") => {
+const uploadToCloudinary = async (file, folderOrOptions = "general") => {
   try {
     // Validate file
     if (!file) {
       throw new Error("No file provided");
     }
+
+    const options =
+      typeof folderOrOptions === "object"
+        ? folderOrOptions
+        : { folder: folderOrOptions };
+
+    // Client-side upload using FormData
+    const folder =
+      typeof folderOrOptions === "string"
+        ? folderOrOptions
+        : options.folder || "general";
 
     // Get Cloudinary config from environment
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -23,6 +35,23 @@ const uploadToCloudinary = async (file, folder = "general") => {
     formData.append("file", file);
     formData.append("upload_preset", uploadPreset);
     formData.append("folder", folder);
+
+    // Add transformations if provided (client-side)
+    if (options.transformation && Array.isArray(options.transformation)) {
+      const transformationString = options.transformation
+        .map((t) => {
+          const parts = [];
+          if (t.width) parts.push(`w_${t.width}`);
+          if (t.height) parts.push(`h_${t.height}`);
+          if (t.crop) parts.push(`c_${t.crop}`);
+          if (t.gravity) parts.push(`g_${t.gravity}`);
+          return parts.join(",");
+        })
+        .join("/");
+      if (transformationString) {
+        formData.append("transformation", transformationString);
+      }
+    }
 
     // Upload to Cloudinary
     const response = await fetch(
@@ -40,7 +69,7 @@ const uploadToCloudinary = async (file, folder = "general") => {
 
     const result = await response.json();
 
-    // Return the secure URL
+    // Return the secure URL (client-side returns string directly)
     return result.secure_url;
   } catch (error) {
     console.error("Cloudinary upload error:", error);

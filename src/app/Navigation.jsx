@@ -6,7 +6,7 @@ import { BookOpen, Menu, X, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui";
 import routes from "@/config/routes";
 import { useRouterWithProgress } from "@/hooks";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromCookie } from "@/utils/cookies";
 
 const NAV_LINKS = [
   { label: "Marketplace", href: routes.marketplace },
@@ -23,19 +23,27 @@ export default function Navigation() {
   // Check if user is authenticated
   useEffect(() => {
     const checkAuth = () => {
-      const userData = getFromLocalStorage("techverse");
-      if (userData && userData.accessToken) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
+      const accessToken = getFromCookie("accessToken");
+      const user = localStorage.getItem("user");
+      setIsAuthenticated(!!(accessToken && user));
     };
 
     checkAuth();
 
     // Listen for storage changes (e.g., when user logs in/out in another tab)
     window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
+    
+    // Listen for custom auth events (same tab login/logout)
+    window.addEventListener("authStateChange", checkAuth);
+    
+    // Also check periodically to catch any changes
+    const interval = setInterval(checkAuth, 1000);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("authStateChange", checkAuth);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
